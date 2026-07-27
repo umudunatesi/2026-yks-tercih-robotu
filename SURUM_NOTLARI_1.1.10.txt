@@ -1,0 +1,6 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.10
+
+- Başarı sırası aralığıyla filtreleme yapılırken sıralaması bulunmayan
+  Dolmadı, Yer.Olmadı ve Yeni programların sonuçtan çıkarılması düzeltildi.
+- Örneğin 250.000–300.000 aralığı artık bu aralıktaki sayısal sıralamaları
+  ve seçili diğer filtrelere uyan dolmayan/yeni programları birlikte gösterir.

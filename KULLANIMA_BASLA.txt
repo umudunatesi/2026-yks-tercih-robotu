@@ -1,0 +1,33 @@
+2026 YKS TERCİH ROBOTU - SÜRÜM 1.1.6
+
+İLK KURULUM
+1. setup_windows.bat dosyasını çalıştırın.
+2. İlk yönetici hesabını oluşturun.
+3. start_yks.bat dosyasını çalıştırın.
+
+NORMAL KULLANIM
+- Uygulamayı açmak için start_yks.bat
+- Uygulamayı ve arka plan hizmetini kapatmak için stop_yks.bat
+- Kurulumu kontrol etmek için verify_windows.bat
+- Teknik destek raporu oluşturmak için support_report.bat
+- Uçtan uca kontrol için acceptance_test.bat
+- Son yedeğe dönmek için restore_latest_backup.bat
+
+GÜNCELLEME
+- setup_windows.bat tekrar çalıştırılabilir.
+- Güncelleme öncesinde veritabanı otomatik yedeklenir.
+- Öğrenciler, sınav sonuçları ve tercih listeleri korunur.
+
+YEDEKLER
+- Otomatik yedekler backups klasöründe tutulur.
+- Son 10 yedek korunur.
+- Geri yüklemeden önce mevcut veritabanının ayrıca güvenlik yedeği alınır.
+
+VERİ AÇIKLAMASI
+- 2023 ve 2024 başarı sıralamaları kaynak dosyada mevcuttur.
+- Kaynak dosyada 2023–2024 taban puan/kontenjan bulunmadığından raporda
+  bu alanlar “—” olarak gösterilir.
+
+ÖNEMLİ
+Bu uygulama karar destek amaçlıdır. Kesin yerleşme garantisi vermez.
+Güncel ÖSYM/YÖK kılavuzu ve program özel koşulları mutlaka kontrol edilmelidir.

@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: yks
+      POSTGRES_USER: yks
+      POSTGRES_PASSWORD: yks_dev_only
+    ports: ["5432:5432"]
+    volumes: [yks_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yks"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  backend:
+    image: python:3.13-slim
+    working_dir: /app
+    volumes: ["./backend:/app"]
+    command: sh -c "pip install -r requirements.txt && uvicorn app.main:app --host 0.0.0.0 --reload"
+    environment:
+      DATABASE_URL: postgresql+psycopg://yks:yks_dev_only@db:5432/yks
+      SECRET_KEY: ${SECRET_KEY:-local-development-key}
+    ports: ["8000:8000"]
+    depends_on:
+      db: {condition: service_healthy}
+volumes:
+  yks_data:

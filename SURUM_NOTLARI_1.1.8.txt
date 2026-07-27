@@ -1,0 +1,7 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.8
+
+- Program Ara ekranında “2025 yerleşme durumu: Tümü” seçiliyken
+  Dolmadı, Yeni ve Yer.Olmadı kayıtlarının sonuçlarda görünmesi düzeltildi.
+- Tümü görünümündeki sıralama, başarı sırası bulunmayan programları yüzlerce
+  sayfa sona atmayacak şekilde düzenlendi.
+- Yerleşme durumu değiştirildiğinde sonuçların anında yenilenmesi sağlandı.

@@ -1,0 +1,6 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.2.2
+
+- Program adlarının yanında ücret durumu rozeti gösterilir.
+- Ücretli, burslu ve indirimli programlar listede doğrudan ayırt edilebilir.
+- Program adlarının yanında öğretim dili rozeti gösterilir.
+- Ücret ve dil bilgileri Program Ara, favoriler, tercih listesi ve program detaylarında görünür.

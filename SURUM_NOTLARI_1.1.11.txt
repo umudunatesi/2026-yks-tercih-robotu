@@ -1,0 +1,8 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.11
+
+- Tercih Listesi ekranına “Formu temizle” butonu eklendi.
+- Form temizlendiğinde tercihler, seçili öğrenci, başarı sıralamaları, liste
+  adı, analiz sonuçları ve düzenlenen taslak bağlantısı sıfırlanır.
+- Kayıtlı öğrenciler ve daha önce kaydedilmiş tercih listeleri korunur.
+- Öğrenci seçim alanının temizleme sonrasında görsel olarak da sıfırlanması
+  sağlandı.

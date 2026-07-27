@@ -1,0 +1,8 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.2
+
+- Tüm yazılı program filtreleri Türkçe büyük/küçük harften bağımsız çalışır.
+- İ/i ve I/ı farklılıkları arama sırasında güvenli biçimde eşleştirilir.
+- Program, üniversite, fakülte, program kodu ve şehir araması güncellendi.
+- Üniversite türü, öğretim dili, öğretim türü ve ücret filtreleri eşitlendi.
+- İstanbul/İSTANBUL, ısparta/ISPARTA ve hacettepe/HACETTEPE canlı
+  sonuç sayıları karşılaştırılarak doğrulandı.

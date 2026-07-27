@@ -1,0 +1,8 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.1
+
+- Bölge filtresi ön lisans programlarını da kapsayacak şekilde düzeltildi.
+- Bölgesi kaynak tabloda boş olan programların bölgesi şehirden belirleniyor.
+- Marmara, Ege, Akdeniz, İç Anadolu, Karadeniz, Doğu Anadolu,
+  Güney Doğu, KKTC ve yurt dışı eşlemeleri doğrulandı.
+- Çoklu bölge seçimi ve diğer gelişmiş filtrelerle birlikte kullanım korunuyor.
+- Backend testleri, uçtan uca kabul testi ve Windows derlemesi doğrulandı.

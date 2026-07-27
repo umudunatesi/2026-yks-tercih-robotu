@@ -1,0 +1,8 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.2.4
+
+- ÖSYM kılavuzundaki özel koşulların 1. ve 2. kısımları birlikte işlendi.
+- Kılavuzdaki 197 özel koşul açıklamasının tamamı uygulamaya eklendi.
+- Programlarda kullanılan 194 farklı koşul kodunun tamamı açıklamayla eşleştirildi.
+- Tıp programlarındaki 155 ve mühendislik programlarındaki 144 numaralı koşullar eklendi.
+- 21.482 programdaki toplam 50.301 koşul referansında açıklamasız kod kalmadığı doğrulandı.
+- Program detayları ve tercih PDF’sinin koşul eki güncellendi.

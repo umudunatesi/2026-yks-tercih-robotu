@@ -1,0 +1,47 @@
+import argparse, os, sys
+from pathlib import Path
+ROOT = Path(__file__).parents[1]
+ORIGINAL_CWD = Path.cwd()
+os.chdir(ROOT / "backend")
+sys.path.insert(0, str(ROOT / "backend"))
+from app.core.database import Base, SessionLocal, engine
+from app.importers.yks_excel import analyze, iter_programs
+from app.models.entities import DataImport, Program, ProgramRankHistory
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file"); parser.add_argument("--year", type=int, default=2026)
+    parser.add_argument("--analyze-only", action="store_true")
+    args = parser.parse_args()
+    source_file = Path(args.file)
+    source_file = (ORIGINAL_CWD / source_file).resolve() if not source_file.is_absolute() else source_file.resolve()
+    report = analyze(source_file); print(report)
+    if args.analyze_only: return
+    if not report["matches_expected"] or report["duplicate_codes"]:
+        raise SystemExit("Doğrulama başarısız; veri tabanında değişiklik yapılmadı.")
+    Base.metadata.create_all(engine)
+    with SessionLocal.begin() as db:
+        db.query(DataImport).update({DataImport.is_active: False})
+        imported = db.query(DataImport).filter_by(file_hash=report["sha256"]).one_or_none()
+        if imported is None:
+            imported = DataImport(data_year=args.year, file_name=Path(args.file).name,
+                                  file_hash=report["sha256"], record_count=report["total"],
+                                  is_active=True, report=report)
+            db.add(imported)
+        else:
+            imported.data_year = args.year
+            imported.file_name = Path(args.file).name
+            imported.record_count = report["total"]
+            imported.is_active = True
+            imported.report = report
+        for data in iter_programs(source_file):
+            history = data.pop("history")
+            program = db.scalar(db.query(Program).filter_by(data_year=args.year, program_code=data["program_code"]).statement)
+            if program is None:
+                program = Program(**data); db.add(program); db.flush()
+            else:
+                for key, value in data.items(): setattr(program, key, value)
+                db.query(ProgramRankHistory).filter_by(program_id=program.id).delete()
+            db.add_all(ProgramRankHistory(program_id=program.id, **item) for item in history)
+    print(f"{report['total']} kayıt başarıyla içe aktarıldı.")
+if __name__ == "__main__": main()

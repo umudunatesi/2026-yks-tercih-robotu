@@ -1,0 +1,17 @@
+2026 YKS TERCİH ROBOTU - SÜRÜM 1.0.0
+
+- 21.482 program için gelişmiş arama ve çoklu filtreleme
+- TYT, SAY, EA, SÖZ ve DİL başarı sıralaması desteği
+- Öğrenci, YKS sonucu ve görüşme notu yönetimi
+- Çoklu puan türüyle karma tercih listesi
+- Tıp, diş hekimliği, hukuk, eczacılık, mimarlık, mühendislik ve
+  öğretmenlik başarı sırası kuralları
+- Baraj dışı, yüksek hedef, hedef, dengeli ve güvenli renk/ikon analizi
+- Kalıcı tercih taslağı ve kayıtlı liste sürümleri
+- 50 tercihlik yoğun, iki sayfalık PDF önizleme/baskı/paylaşım
+- Excel ve CSV çıktıları
+- Yönetici, rehber öğretmen, öğretmen ve görüntüleyici rolleri
+- Kullanıcı düzenleme ve şifre yenileme
+- Otomatik yedekleme, güvenli geri yükleme ve destek raporu
+- Tekrarlanabilir Windows kurulum/güncelleme ve sağlık kontrolü
+- Canlı program arama ve hızlı çoklu filtreleme

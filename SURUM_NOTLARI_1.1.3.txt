@@ -1,0 +1,9 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.3
+
+- Öğrenci kayıt formuna TYT, SAY, EA, SÖZ ve DİL sonuç alanları eklendi.
+- Her puan türü için puan ve başarı sırası aynı ekranda girilebilir.
+- Öğrenci ve sınav sonuçları tek, güvenli veritabanı işlemiyle kaydedilir.
+- Öğrenci düzenlenirken mevcut 2026 YKS sonuçları otomatik yüklenir.
+- Boş bırakılan puan türleri zorunlu değildir.
+- Hatalı puan ve başarı sırası için kayıt öncesi açıklayıcı doğrulama yapılır.
+- Birleşik kayıt, karma tercih, PDF ve Excel kabul testiyle doğrulandı.

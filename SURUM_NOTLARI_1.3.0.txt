@@ -1,0 +1,12 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.3.0
+
+- Menüye “Özel Yetenek Sınavı Programları” sayfası eklendi.
+- ÖSYM kılavuzunun Tablo 5 bölümündeki 1.246 program aktarıldı.
+- 934 devlet, 247 vakıf ve 65 KKTC programı ayrı türlerle gösterilir.
+- Program kodu, üniversite, fakülte/yüksekokul, kontenjan, özel koşullar,
+  TYÇ, akreditasyon, ücret durumu, KKTC uyruklu bilgisi ve kaynak sayfa
+  eksiksiz gösterilir.
+- Program, kod, fakülte, üniversite, kurum türü, akreditasyon, koşul kodu,
+  kontenjan aralığı ve KKTC uyruklu bilgisiyle filtreleme eklendi.
+- Tablo 5 koşul açıklamaları programlarla eşleştirildi.
+- Türkçe büyük/küçük harf duyarsız arama desteklenir.

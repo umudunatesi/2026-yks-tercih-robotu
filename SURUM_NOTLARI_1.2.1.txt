@@ -1,0 +1,7 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.2.1
+
+- Excel dosyasındaki “KKTC U.” program türü doğru biçimde işlendi.
+- Yalnız KKTC uyruklu adaylara açık 454 program “KKTC Uyruklu” etiketiyle gösterilir.
+- Etiket Program Ara sonuçlarında, tercih listesinde ve program detayında görünür.
+- PDF çıktısındaki ek bilgi alanına “KKTC Uyruklu” bilgisi eklendi.
+- Normal “KKTC”, “DEVLET KKTC” ve “KKTC UOLP” türleri bu özel etiketle karıştırılmaz.

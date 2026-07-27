@@ -1,0 +1,8 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.9
+
+- Program Ara sonuçları üniversite adının harf sırası yerine 2025 başarı
+  sırasına göre sıralandı.
+- Sayısal başarı sırası bulunan programlar en iyi sıralamadan başlayarak
+  gösteriliyor.
+- Dolmadı, Yeni ve Yer.Olmadı kayıtları Tümü kapsamındaki yerini koruyor;
+  yerleşme durumu filtresiyle doğrudan listelenebiliyor.

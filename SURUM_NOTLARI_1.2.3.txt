@@ -1,0 +1,7 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.2.3
+
+- ÖSYM 2026-YKS kılavuzunun 552-567. sayfalarındaki 160 özel koşul açıklaması eklendi.
+- Programların özel koşul kodları kılavuz açıklamalarıyla eşleştirildi.
+- Program detayında koşul kodunun altında tam açıklama gösterilir.
+- Tercih PDF’sinin sonunda yalnız listedeki programlarda kullanılan koşullar açıklamalarıyla yer alır.
+- PDF koşul ekinde kılavuz ve sayfa aralığı kaynak bilgisi gösterilir.

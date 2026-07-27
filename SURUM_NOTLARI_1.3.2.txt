@@ -1,0 +1,11 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.3.2
+
+- 2026-YKS Kontenjan Kılavuzu Tablo 4 kaynağındaki KPSS verileri program
+  kodlarıyla yeniden doğrulandı.
+- KPSS değeri bulunan 6.342 programın tamamı uygulamadaki program kodlarıyla
+  birebir eşleşti; eksik, farklı veya eşleşmeyen kayıt bulunmadı.
+- KPSS puanı Program Ara sonuçlarında, program detayında ve tercih listesindeki
+  ayrıntılı tabloda görünür hâle getirildi.
+- Tercih listesi PDF çıktısına okunaklı ve üç ondalık basamaklı KPSS sütunu
+  eklendi.
+- CSV ve Excel dışa aktarımlarına KPSS alanı eklendi.

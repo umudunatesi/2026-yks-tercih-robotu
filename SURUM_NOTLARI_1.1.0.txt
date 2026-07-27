@@ -1,0 +1,17 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.0
+
+- Pastel, modern Windows arayüzü ve kalıcı sol menü
+- Çoklu puan türü, bölge ve kontenjan filtreleri
+- SAY, EA, SÖZ ve DİL sonuçlarıyla karma tercih listesi
+- Baraj, hedef ve güvenli tercihlerin renkli/simgeli analizi
+- Öğrenci, kullanıcı, rol, kayıtlı liste ve taslak yönetimi
+- Toplu program seçimi ve kalıcı tercih sepeti
+- Minimal, çok satırlı PDF önizleme ve Excel dışa aktarma
+- Listeyi güvenli biçimde boşaltma
+- Otomatik yedekleme, son yedeği geri yükleme ve destek raporu
+- Geçici veritabanında uçtan uca kabul testi
+- Kişisel veri içermeyen doğrulanmış Windows dağıtım paketi
+
+Not: Kaynak 25 Temmuz Excel dosyasında 2023–2024 taban puan ve
+kontenjan alanları bulunmadığı için bu değerler raporda “—” gösterilir.
+Bu yıllara ait başarı sıralamaları eksiksiz biçimde kullanılır.

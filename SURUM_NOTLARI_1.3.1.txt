@@ -1,0 +1,11 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.3.1
+
+- Tablo 5 özel koşul sütunu bütün programlarda yeniden denetlendi.
+- Anadolu Üniversitesi Engelliler Entegre Yüksekokulu programlarındaki
+  5 ve 1,5 numaralı koşullar veri kümesine işlendi.
+- Grafik Sanatlar (Lisans), Seramik (Lisans) ve KKTC Uyruklu
+  kontenjanlarında eksik koşullar tamamlandı.
+- Kılavuzun 598. sayfasında Bk. 5 başlığı bulunmadığı açıkça belirtilerek,
+  aynı sayfadaki engelli adaylara ilişkin genel açıklama programa eklendi.
+- Koşul hücresi bulunan 190 programın tamamında kodlar ve açıklamalar
+  eşleştirildi; açıklamasız koşul kalmadı.

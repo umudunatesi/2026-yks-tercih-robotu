@@ -1,0 +1,10 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.4
+
+- Öğrenciler ad, soyad, okul, telefon ve e-posta ile aranabilir.
+- Arama Türkçe büyük/küçük harf farklılıklarından etkilenmez.
+- Öğrenci listesi ada, ardından soyada göre alfabetik sıralanır.
+- Her öğrencinin toplam tercih çalışması sayısı listede gösterilir.
+- Son tercih tarihi öğrenci satırında gösterilir.
+- Takvim simgesinden tüm tercih adları, tarihleri, sürümleri ve
+  taslak/tamamlandı/arşiv durumları görüntülenebilir.
+- Geçmişte kaydedilmiş tercih listeleri de otomatik olarak sayılır.

@@ -1,0 +1,12 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.2.0
+
+- Kontrollü uzaktan güncelleme sistemi eklendi.
+- Uygulama açılışında isteğe bağlı yeni sürüm kontrolü eklendi.
+- Uygulama çubuğuna “Güncellemeleri kontrol et” düğmesi eklendi.
+- Sistem Ayarları ekranına manifest adresi ve otomatik kontrol ayarları eklendi.
+- Güncelleme paketi kurulmadan önce SHA-256 ile doğrulanır.
+- Kurulum öncesinde öğrenci veritabanı ve uygulama dosyaları yedeklenir.
+- Kurulum başarısız olursa önceki uygulama dosyaları geri yüklenir.
+- Kullanıcı onayı olmadan güncelleme kurulmaz.
+
+Manifest örneği: docs\UPDATE_MANIFEST_EXAMPLE.json

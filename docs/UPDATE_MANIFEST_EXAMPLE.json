@@ -1,0 +1,10 @@
+{
+  "version": "1.2.1",
+  "download_url": "https://example.com/releases/2026-YKS-Tercih-Robotu-1.2.1.zip",
+  "sha256": "PAKETIN_64_KARAKTERLIK_SHA256_DEGERI",
+  "release_notes": [
+    "Yeni özellikler",
+    "Hata düzeltmeleri"
+  ],
+  "mandatory": false
+}

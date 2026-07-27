@@ -1,0 +1,7 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.5
+
+- Öğrenciler sayfasındaki gri ekran sorunu giderildi.
+- Tercih tarihleri yerel ayar verisine bağımlı olmadan biçimlendiriliyor.
+- Beklenmeyen tarih değerleri artık sayfanın tamamını durdurmuyor.
+- Tercih geçmişi bulunan öğrenci verisiyle otomatik ekran testi eklendi.
+- Öğrenci adı, tercih sayısı ve son tercih tarihi birlikte doğrulandı.

@@ -1,0 +1,10 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.7
+
+- Tercih listesindeki 2023 sıralama sütunu kaldırıldı.
+- Tablo sütunları ve satırları tüm ekranlarda daha rahat kullanılacak şekilde
+  kompaktlaştırıldı; dar ekranlarda güvenli yatay kaydırma korunuyor.
+- Tercih listesindeki program satırına tıklanınca kapsamlı detay penceresi
+  açılması sağlandı.
+- Detay penceresine program, üniversite, fakülte, şehir, puan türü, öğrenim,
+  süre, dil, ücret, puan/sıralama, kontenjan, baraj, özel kontenjanlar,
+  akademik kadro, akreditasyon, geçmiş sıralamalar ve özel koşullar eklendi.

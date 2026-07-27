@@ -1,0 +1,10 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.1.6
+
+- Tercih Listesi, PDF’deki ayrıntılı bilgi tablosuna dönüştürüldü.
+- Program kodu, program/üniversite, puan türü, öğrenim türü, süre,
+  dil, ücret, 2025–2023 sıralamaları, 2025 puanı, 2026 kontenjanı,
+  özel koşullar ve akreditasyon ekranda gösterilir.
+- Geniş tablo yatay kaydırılabilir.
+- Tercih sıralama ve listeden çıkarma işlemleri korunur.
+- Kayıtlı listeler de aynı ayrıntılı tabloyla açılır.
+- Kayıtlı liste yeniden düzenlemeye alındığında ayrıntılar kaybolmaz.
