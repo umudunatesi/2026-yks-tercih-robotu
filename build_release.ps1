@@ -1,18 +1,22 @@
 $ErrorActionPreference = "Stop"
 $projectRoot = $PSScriptRoot
-$version = "1.3.2"
+$version = "1.3.3"
 $outputRoot = Join-Path (Split-Path $projectRoot -Parent) "outputs\releases"
 $packageName = "2026-YKS-Tercih-Robotu-$version"
 $stage = Join-Path $outputRoot $packageName
 $archive = Join-Path $outputRoot "$packageName.zip"
 $python = Join-Path $projectRoot "backend\.venv\Scripts\python.exe"
 $releaseApp = Join-Path $projectRoot "frontend\build\windows\x64\runner\Release"
+$backendRuntime = Join-Path $projectRoot "backend\dist\yks_backend"
 
 if (-not (Test-Path -LiteralPath $python)) {
     throw "Python ortamı bulunamadı."
 }
 if (-not (Test-Path -LiteralPath (Join-Path $releaseApp "yks_tercih_robotu.exe"))) {
     throw "Windows Release uygulaması bulunamadı."
+}
+if (-not (Test-Path -LiteralPath (Join-Path $backendRuntime "yks_backend.exe"))) {
+    throw "Derlenmiş backend bulunamadı."
 }
 New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
 $resolvedOutput = (Resolve-Path $outputRoot).Path
@@ -36,6 +40,8 @@ Copy-Item -LiteralPath (Join-Path $projectRoot "backend\app") `
     -Destination (Join-Path $stage "backend\app") -Recurse
 Copy-Item -LiteralPath (Join-Path $projectRoot "backend\alembic") `
     -Destination (Join-Path $stage "backend\alembic") -Recurse
+Copy-Item -LiteralPath $backendRuntime `
+    -Destination (Join-Path $stage "backend\bin") -Recurse
 Copy-Item -Path (Join-Path $projectRoot "scripts\*") `
     -Destination (Join-Path $stage "scripts") -Recurse
 Copy-Item -Path (Join-Path $projectRoot "docs\*") `
@@ -54,7 +60,7 @@ foreach ($file in @(
     ".env.example",
     "README.md",
     "KULLANIMA_BASLA.txt",
-    "SURUM_NOTLARI_1.3.2.txt",
+    "SURUM_NOTLARI_1.3.3.txt",
     "setup_windows.bat",
     "setup_windows.ps1",
     "start_yks.bat",

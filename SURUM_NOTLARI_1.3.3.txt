@@ -1,0 +1,11 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.3.3
+
+- Son kullanıcılar için tek dosyalık Windows Setup kurucusu hazırlandı.
+- Kurulum artık bilgisayarda Python veya Flutter bulunmasını gerektirmiyor.
+- Gerekli backend çalışma ortamı kurucuya dahil edildi; kurulum çevrimdışı
+  tamamlanabiliyor.
+- İlk kurulumda yönetici adı, e-posta adresi ve şifresi kurulum ekranından
+  belirlenebiliyor.
+- Masaüstü ve Başlat menüsü kısayolları otomatik oluşturuluyor.
+- Güncelleme sırasında mevcut öğrenci, tercih ve kullanıcı verileri korunuyor.
+- Resmî güncelleme adresi bu projenin GitHub Releases sayfasına bağlandı.

@@ -34,9 +34,9 @@ from app.services.special_talent import (
 )
 
 Base.metadata.create_all(engine)
-APP_VERSION = "1.3.2"
+APP_VERSION = "1.3.3"
 OFFICIAL_UPDATE_MANIFEST_URL = (
-    "https://github.com/umudunatesi/yks-tercih-robotu-guncellemeler/"
+    "https://github.com/umudunatesi/2026-yks-tercih-robotu/"
     "releases/latest/download/latest.json"
 )
 app = FastAPI(title="2026 YKS Tercih Robotu API", version=APP_VERSION)
