@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime
 from html import escape
 from io import BytesIO, StringIO
 from pathlib import Path
@@ -85,12 +86,16 @@ def preference_xlsx(items) -> bytes:
 def preference_pdf(
     pref_list, student, items, exam_results=None, history_by_program=None
 ) -> bytes:
+    if student is None:
+        raise ValueError("PDF için öğrenci bilgisi gereklidir")
+    if not items:
+        raise ValueError("Boş tercih listesi PDF olarak dışa aktarılamaz")
     exam_results = exam_results or []
     history_by_program = history_by_program or {}
     output = BytesIO()
     doc = SimpleDocTemplate(
         output, pagesize=landscape(A4), leftMargin=5 * mm, rightMargin=5 * mm,
-        topMargin=5 * mm, bottomMargin=5 * mm,
+        topMargin=5 * mm, bottomMargin=9 * mm,
     )
     styles = getSampleStyleSheet()
     styles["Title"].fontName = "Roboto-Bold"
@@ -146,10 +151,12 @@ def preference_pdf(
     pdf_headers = [
         "Sıra", "Program Kodu", "Program / Üniversite", "Tür",
         "Ek / Öğrenim", "Süre", "Dil", "Ücret durumu",
-        "2025 Sıra", "2024 Sıra", "2023 Sıra",
-        "2025 Puan", "2024 Puan", "2023 Puan",
-        "2026 Kont.", "2025 Kont.", "2024 Kont.",
-        "KPSS", "Özel koşullar", "Akreditasyon",
+        "2025 Sıra", "2024 Sıra", "2025 Puan",
+        "2026 Kont.", "KPSS", "Özel koşullar", "Akreditasyon",
+    ]
+    header_cells = [
+        Paragraph(f"<b>{escape(header)}</b>", styles["Normal"])
+        for header in pdf_headers
     ]
     body = []
     for item in items:
@@ -161,7 +168,7 @@ def preference_pdf(
                 if year in history and history[year].rank is not None
                 else ((history[year].status or "—") if year in history else "—")
             )
-            for year in (2025, 2024, 2023)
+            for year in (2025, 2024)
         }
         score_2025 = (
             f"{getattr(program, 'min_score_2025', None):.3f}"
@@ -202,13 +209,8 @@ def preference_pdf(
             ),
             Paragraph(f"<b>{rank_values[2025]}</b>", styles["Normal"]),
             Paragraph(str(rank_values[2024]), styles["Normal"]),
-            Paragraph(str(rank_values[2023]), styles["Normal"]),
             Paragraph(f"<b>{score_2025}</b>", styles["Normal"]),
-            "—",
-            "—",
             str(quota_2026),
-            "—",
-            "—",
             Paragraph(f"<b>{escape(kpss_text)}</b>", styles["Normal"]),
             Paragraph(escape(special), styles["Normal"]),
             Paragraph(
@@ -218,12 +220,11 @@ def preference_pdf(
         ])
 
     table = Table(
-        [pdf_headers] + body, repeatRows=1,
+        [header_cells] + body, repeatRows=1,
         colWidths=[
-            6 * mm, 18 * mm, 39 * mm, 8 * mm, 13 * mm, 6 * mm,
-            12 * mm, 18 * mm, 13 * mm, 13 * mm, 13 * mm,
-            13 * mm, 13 * mm, 13 * mm, 11 * mm, 11 * mm, 11 * mm,
-            14 * mm, 24 * mm, 14 * mm,
+            6 * mm, 19 * mm, 55 * mm, 9 * mm, 18 * mm, 7 * mm,
+            14 * mm, 20 * mm, 15 * mm, 15 * mm, 15 * mm,
+            13 * mm, 14 * mm, 27 * mm, 19 * mm,
         ],
     )
     table.setStyle(TableStyle([
@@ -286,5 +287,22 @@ def preference_pdf(
                 f"{escape(used_conditions[code])}",
                 condition_style,
             ))
-    doc.build(story)
+    def add_page_footer(canvas, document):
+        canvas.saveState()
+        canvas.setFont("Roboto", 6)
+        canvas.setFillColor(colors.HexColor("#64748B"))
+        canvas.drawString(
+            document.leftMargin,
+            4 * mm,
+            f"{student.first_name} {student.last_name} - "
+            f"{getattr(pref_list, 'name', 'Tercih Listesi')}",
+        )
+        canvas.drawRightString(
+            landscape(A4)[0] - document.rightMargin,
+            4 * mm,
+            f"Sayfa {document.page} | {datetime.now():%d.%m.%Y %H:%M}",
+        )
+        canvas.restoreState()
+
+    doc.build(story, onFirstPage=add_page_footer, onLaterPages=add_page_footer)
     return output.getvalue()

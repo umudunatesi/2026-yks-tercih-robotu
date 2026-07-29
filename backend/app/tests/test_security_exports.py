@@ -1,4 +1,5 @@
 from types import SimpleNamespace
+import pytest
 from app.core.security import hash_password, verify_password
 from app.services.exports import (
     format_kpss, preference_csv, preference_pdf, preference_xlsx,
@@ -32,6 +33,13 @@ def test_pdf_is_generated_with_turkish_text():
     student = SimpleNamespace(first_name="Çağrı", last_name="Öğüt", school="Örnek Lisesi")
     pdf = preference_pdf(pref, student, [item])
     assert pdf.startswith(b"%PDF") and len(pdf) > 10_000
+
+
+def test_empty_preference_list_does_not_create_blank_pdf():
+    pref = SimpleNamespace(id=1, version=1, name="Boş liste")
+    student = SimpleNamespace(first_name="Ada", last_name="Yılmaz", school=None)
+    with pytest.raises(ValueError, match="Boş tercih listesi"):
+        preference_pdf(pref, student, [])
 
 
 def test_kpss_display_uses_three_decimal_places():

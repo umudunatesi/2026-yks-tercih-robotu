@@ -39,6 +39,27 @@ final comparisonProvider = StateProvider<List<Map<String, dynamic>>>((_) => []);
 final sessionExpiredNotifier = ValueNotifier<bool>(false);
 bool updateCheckStarted = false;
 
+String dioErrorMessage(DioException error, String fallback) {
+  dynamic data = error.response?.data;
+  if (data is Uint8List) {
+    try {
+      data = jsonDecode(utf8.decode(data));
+    } catch (_) {
+      return fallback;
+    }
+  } else if (data is List<int>) {
+    try {
+      data = jsonDecode(utf8.decode(data));
+    } catch (_) {
+      return fallback;
+    }
+  }
+  if (data is Map && data['detail'] != null) {
+    return data['detail'].toString();
+  }
+  return fallback;
+}
+
 List<DropdownMenuItem<String>> filterItems(List<String> values) => [
       const DropdownMenuItem<String>(value: null, child: Text('Tümü')),
       ...values.map((x) => DropdownMenuItem(value: x, child: Text(x)))
@@ -438,7 +459,7 @@ class AppShell extends ConsumerWidget {
                       ? 'Oturum açılmadı'
                       : 'Rol: ${roleLabel(ref.watch(userRoleProvider))}',
                   style: Theme.of(context).textTheme.bodySmall),
-              Text('Sürüm 1.3.4',
+              Text('Sürüm 1.3.5',
                   style: Theme.of(context).textTheme.labelSmall),
               const SizedBox(height: 4),
               Text('Programı hazırlayan:\nPsikolojik Danışman Uğur Güdük',
@@ -4032,9 +4053,9 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                         icon: const Icon(Icons.archive_outlined),
                         label: const Text('Arşivle')),
                   TextButton.icon(
-                      onPressed: () => downloadExport(listId, 'pdf'),
+                      onPressed: () => previewPdf(listId),
                       icon: const Icon(Icons.picture_as_pdf_outlined),
-                      label: const Text('PDF')),
+                      label: const Text('PDF önizle')),
                   TextButton.icon(
                       onPressed: () => downloadExport(listId, 'xlsx'),
                       icon: const Icon(Icons.table_view_outlined),
@@ -4091,8 +4112,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     } on DioException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text(e.response?.data['detail'] ?? 'Dosya indirilemedi.')));
+            content: Text(dioErrorMessage(e, 'Dosya indirilemedi.'))));
       }
     }
   }
@@ -4122,8 +4142,8 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     } on DioException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-                e.response?.data['detail'] ?? 'PDF önizlemesi açılamadı.')));
+            content:
+                Text(dioErrorMessage(e, 'PDF önizlemesi açılamadı.'))));
       }
     }
   }

@@ -34,7 +34,7 @@ from app.services.special_talent import (
 )
 
 Base.metadata.create_all(engine)
-APP_VERSION = "1.3.4"
+APP_VERSION = "1.3.5"
 OFFICIAL_UPDATE_MANIFEST_URL = (
     "https://github.com/umudunatesi/2026-yks-tercih-robotu/"
     "releases/latest/download/latest.json"
@@ -989,7 +989,13 @@ def _export_data(list_id: int, db: Session):
     pref = db.get(PreferenceList, list_id)
     if not pref: raise HTTPException(404, "Tercih listesi bulunamadı")
     student = db.get(Student, pref.student_id)
+    if not student:
+        raise HTTPException(409, "Tercih listesinin öğrenci kaydı bulunamadı")
     items = db.scalars(select(PreferenceItem).where(PreferenceItem.preference_list_id == list_id).order_by(PreferenceItem.position)).all()
+    if not items:
+        raise HTTPException(409, "Tercih listesi boş. PDF oluşturmadan önce programa tercih ekleyin.")
+    if any(item.program is None for item in items):
+        raise HTTPException(409, "Tercih listesindeki bir program kaydı artık bulunamıyor")
     return pref, student, items
 
 @app.get("/api/preference-lists/{list_id}/export.csv")
@@ -1011,7 +1017,7 @@ def export_pdf(list_id: int, db: Session = Depends(get_db), _: User = Depends(cu
     program_ids = [item.program_id for item in items]
     histories = db.scalars(select(ProgramRankHistory).where(
         ProgramRankHistory.program_id.in_(program_ids),
-        ProgramRankHistory.year.in_([2025, 2024, 2023]))).all() if program_ids else []
+        ProgramRankHistory.year.in_([2025, 2024]))).all() if program_ids else []
     history_by_program = {}
     for history in histories:
         history_by_program.setdefault(history.program_id, {})[history.year] = history
