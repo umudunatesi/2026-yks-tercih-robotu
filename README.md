@@ -37,7 +37,7 @@ python -m venv .venv
 Copy-Item ..\.env.example .env
 alembic upgrade head
 cd ..
-python scripts\import_yks_excel.py "data\2026 YKS TERCİH ROBOTU 25 Temmuz.xlsx"
+python scripts\import_yks_excel.py "data\2026 YKS TERCİH ROBOTU 29 Temmuz.xlsx"
 python scripts\create_admin.py
 cd backend
 .\.venv\Scripts\uvicorn app.main:app --reload

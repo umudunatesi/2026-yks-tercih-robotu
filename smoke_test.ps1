@@ -19,7 +19,7 @@ with sqlite3.connect(db_file) as raw:
     integrity = raw.execute("PRAGMA integrity_check").fetchone()[0]
     program_count = raw.execute("SELECT COUNT(*) FROM programs").fetchone()[0]
 assert integrity == "ok", integrity
-assert program_count >= 21482, program_count
+assert program_count >= 21493, program_count
 
 with SessionLocal() as db:
     user = db.scalar(

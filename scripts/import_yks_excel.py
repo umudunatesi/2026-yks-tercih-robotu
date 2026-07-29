@@ -6,7 +6,9 @@ os.chdir(ROOT / "backend")
 sys.path.insert(0, str(ROOT / "backend"))
 from app.core.database import Base, SessionLocal, engine
 from app.importers.yks_excel import analyze, iter_programs
-from app.models.entities import DataImport, Program, ProgramRankHistory
+from app.models.entities import (
+    DataImport, PreferenceItem, Program, ProgramRankHistory,
+)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -34,8 +36,10 @@ def main():
             imported.record_count = report["total"]
             imported.is_active = True
             imported.report = report
+        imported_codes = set()
         for data in iter_programs(source_file):
             history = data.pop("history")
+            imported_codes.add(data["program_code"])
             program = db.scalar(db.query(Program).filter_by(data_year=args.year, program_code=data["program_code"]).statement)
             if program is None:
                 program = Program(**data); db.add(program); db.flush()
@@ -43,5 +47,25 @@ def main():
                 for key, value in data.items(): setattr(program, key, value)
                 db.query(ProgramRankHistory).filter_by(program_id=program.id).delete()
             db.add_all(ProgramRankHistory(program_id=program.id, **item) for item in history)
-    print(f"{report['total']} kayıt başarıyla içe aktarıldı.")
+        removed = retained = 0
+        stale_programs = db.query(Program).filter(
+            Program.data_year == args.year,
+            Program.program_code.notin_(imported_codes),
+        ).all()
+        for program in stale_programs:
+            is_used = db.query(PreferenceItem.id).filter_by(
+                program_id=program.id
+            ).first()
+            if is_used:
+                retained += 1
+                continue
+            db.query(ProgramRankHistory).filter_by(
+                program_id=program.id
+            ).delete()
+            db.delete(program)
+            removed += 1
+    print(
+        f"{report['total']} kayıt başarıyla içe aktarıldı; "
+        f"{removed} eski kayıt kaldırıldı, {retained} kullanılan kayıt korundu."
+    )
 if __name__ == "__main__": main()

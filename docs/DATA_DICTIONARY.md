@@ -1,14 +1,14 @@
 # Veri Sözlüğü
 
-Kaynak: `2026 YKS TERCİH ROBOTU 25 Temmuz.xlsx`. Asıl başlıklar 2. satırda, veriler 3. satırda başlar.
+Kaynak: `2026 YKS TERCİH ROBOTU 29 Temmuz.xlsx`. Asıl başlıklar 2. satırda, veriler 3. satırda başlar.
 
 ## Doğrulanan kaynak
 
 | Sayfa | Düzey | Sütun | Kayıt |
 |---|---|---:|---:|
-| tablo3 | Ön lisans | 35 (A–AI) | 9.253 |
-| tablo4 | Lisans | 48 (A–AV) | 12.229 |
-| Toplam |  |  | 21.482 |
+| tablo3 | Ön lisans | 35 (A–AI) | 9.254 |
+| tablo4 | Lisans | 48 (A–AV) | 12.239 |
+| Toplam |  |  | 21.493 |
 
 ## Temel alanlar
 

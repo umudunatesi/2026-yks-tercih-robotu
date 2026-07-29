@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 $projectRoot = $PSScriptRoot
-$version = "1.3.5"
+$version = "1.3.6"
 $outputRoot = Join-Path (Split-Path $projectRoot -Parent) "outputs\releases"
 $packageName = "2026-YKS-Tercih-Robotu-$version"
 $stage = Join-Path $outputRoot $packageName
@@ -60,7 +60,7 @@ foreach ($file in @(
     ".env.example",
     "README.md",
     "KULLANIMA_BASLA.txt",
-    "SURUM_NOTLARI_1.3.5.txt",
+    "SURUM_NOTLARI_1.3.6.txt",
     "setup_windows.bat",
     "setup_windows.ps1",
     "start_yks.bat",

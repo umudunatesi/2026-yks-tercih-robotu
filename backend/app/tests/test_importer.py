@@ -4,17 +4,31 @@ from app.core.text_search import normalize_search
 from app.importers.yks_excel import (
     analyze,
     is_kktc_national_type,
+    iter_programs,
     numeric_or_status,
     program_code,
 )
 
-SOURCE = Path(__file__).parents[3] / "data" / "2026 YKS TERCİH ROBOTU 25 Temmuz.xlsx"
+SOURCE = Path(__file__).parents[3] / "data" / "2026 YKS TERCİH ROBOTU 29 Temmuz.xlsx"
 
 def test_real_counts():
     report = analyze(SOURCE)
-    assert report["counts"] == {"tablo3": 9253, "tablo4": 12229}
-    assert report["total"] == 21482
+    assert report["counts"] == {"tablo3": 9254, "tablo4": 12239}
+    assert report["total"] == 21493
     assert not report["duplicate_codes"]
+
+
+def test_new_official_programs_are_included():
+    programs = {item["program_code"]: item for item in iter_programs(SOURCE)}
+    assert len(programs) == 21493
+    assert programs["300900115"]["program"] == "Bilgisayar Programcılığı"
+    assert programs["300900115"]["level"] == "on_lisans"
+    assert programs["102270161"]["program"] == "Çeviribilimi"
+    assert programs["102270161"]["extra"]["kktc_national_only"] is True
+    assert programs["105590149"]["fee_status"] == "%50 İndirimli"
+    assert programs["105590149"]["language"] == "İngilizce"
+    assert programs["301410036"]["threshold_rank"] == 80_000
+    assert "301410037" not in programs
 
 def test_codes_are_text():
     assert program_code(105590209) == "105590209"

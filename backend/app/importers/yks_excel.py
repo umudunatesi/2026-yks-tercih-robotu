@@ -104,7 +104,7 @@ def analyze(path: str | Path) -> dict:
             if code in codes: duplicates.append(code)
             codes.add(code)
     wb.close()
-    expected = {"tablo3": 9253, "tablo4": 12229}
+    expected = {"tablo3": 9254, "tablo4": 12239}
     return {"counts": counts, "total": sum(counts.values()), "expected": expected,
             "matches_expected": counts == expected, "duplicate_codes": duplicates,
             "sha256": hashlib.sha256(Path(path).read_bytes()).hexdigest()}

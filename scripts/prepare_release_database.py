@@ -53,7 +53,7 @@ def main() -> None:
         users = database.execute("SELECT COUNT(*) FROM users").fetchone()[0]
         students = database.execute("SELECT COUNT(*) FROM students").fetchone()[0]
 
-    if integrity != "ok" or programs < 21482 or users != 0 or students != 0:
+    if integrity != "ok" or programs < 21493 or users != 0 or students != 0:
         destination.unlink(missing_ok=True)
         raise SystemExit(
             "Dağıtım veritabanı doğrulanamadı: "

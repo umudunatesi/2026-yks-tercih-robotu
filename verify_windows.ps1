@@ -24,7 +24,7 @@ print(f'{integrity}|{programs}|{students}')
 $result = & $python -c $checkCode $database
 $parts = $result.Trim().Split("|")
 if ($parts[0] -ne "ok") { throw "Veritabani butunluk hatasi: $($parts[0])" }
-if ([int]$parts[1] -lt 21482) { throw "Program sayisi beklenenden az: $($parts[1])" }
+if ([int]$parts[1] -lt 21493) { throw "Program sayisi beklenenden az: $($parts[1])" }
 
 Write-Host "Kurulum dogrulandi." -ForegroundColor Green
 Write-Host "Program: $($parts[1]) | Ogrenci: $($parts[2])"

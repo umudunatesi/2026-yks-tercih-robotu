@@ -34,7 +34,7 @@ from app.services.special_talent import (
 )
 
 Base.metadata.create_all(engine)
-APP_VERSION = "1.3.5"
+APP_VERSION = "1.3.6"
 OFFICIAL_UPDATE_MANIFEST_URL = (
     "https://github.com/umudunatesi/2026-yks-tercih-robotu/"
     "releases/latest/download/latest.json"
@@ -1117,9 +1117,11 @@ async def commit_import(data_year: int, file: UploadFile = File(...),
                               record_count=report["total"], is_active=True, report=report)
         db.add(imported); db.flush()
         added = updated = 0
+        imported_codes = set()
         for values in iter_programs(temporary_path):
             history = values.pop("history")
             values["data_year"] = data_year
+            imported_codes.add(values["program_code"])
             program = db.scalar(select(Program).where(
                 Program.data_year == data_year,
                 Program.program_code == values["program_code"]))
@@ -1130,13 +1132,29 @@ async def commit_import(data_year: int, file: UploadFile = File(...),
                 db.query(ProgramRankHistory).filter_by(program_id=program.id).delete()
                 updated += 1
             db.add_all(ProgramRankHistory(program_id=program.id, **item) for item in history)
+        removed = retained = 0
+        stale_programs = db.scalars(select(Program).where(
+            Program.data_year == data_year,
+            Program.program_code.notin_(imported_codes))).all()
+        for program in stale_programs:
+            is_used = db.scalar(select(PreferenceItem.id).where(
+                PreferenceItem.program_id == program.id).limit(1))
+            if is_used:
+                retained += 1
+                continue
+            db.query(ProgramRankHistory).filter_by(
+                program_id=program.id).delete()
+            db.delete(program)
+            removed += 1
         db.add(AuditLog(user_id=actor.id, action="data_import.commit",
                         entity_type="data_import", entity_id=str(imported.id),
                         details={"year": data_year, "added": added, "updated": updated,
+                                 "removed": removed, "retained": retained,
                                  "sha256": report["sha256"]}))
         db.commit()
         return {"id": imported.id, "data_year": data_year, "record_count": report["total"],
-                "added": added, "updated": updated, "sha256": report["sha256"]}
+                "added": added, "updated": updated, "removed": removed,
+                "retained": retained, "sha256": report["sha256"]}
     except HTTPException:
         db.rollback(); raise
     except Exception:

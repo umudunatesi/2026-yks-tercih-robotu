@@ -14,7 +14,7 @@ Başlatıcı backend’i `127.0.0.1:8000` üzerinde gizli pencerede çalıştır
 1. Backend klasöründe `python -m venv .venv` ve `.venv\Scripts\pip install -r requirements.txt`.
 2. `.env.example` dosyasını `.env` olarak kopyalayıp gizli anahtarı değiştirin.
 3. `alembic upgrade head`.
-4. Kök klasörden `python scripts\import_yks_excel.py "data\2026 YKS TERCİH ROBOTU 25 Temmuz.xlsx"`.
+4. Kök klasörden `python scripts\import_yks_excel.py "data\2026 YKS TERCİH ROBOTU 29 Temmuz.xlsx"`.
 5. `python scripts\create_admin.py` ile parolayı komut satırında girerek yöneticiyi oluşturun.
 6. Backend: `uvicorn app.main:app --reload` (backend klasöründe).
 7. Frontend: `flutter pub get`, ardından `flutter run -d chrome` veya `flutter run -d windows`.
