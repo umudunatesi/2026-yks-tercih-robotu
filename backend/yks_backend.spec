@@ -1,7 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_all
 
-datas = [('app\\reports\\fonts', 'app\\reports\\fonts')]
+datas = [
+    ('app\\reports\\fonts', 'app\\reports\\fonts'),
+    ('app\\data', 'app\\data'),
+]
 binaries = []
 hiddenimports = []
 tmp_ret = collect_all('passlib')

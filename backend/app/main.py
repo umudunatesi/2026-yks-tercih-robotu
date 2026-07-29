@@ -34,7 +34,7 @@ from app.services.special_talent import (
 )
 
 Base.metadata.create_all(engine)
-APP_VERSION = "1.3.3"
+APP_VERSION = "1.3.4"
 OFFICIAL_UPDATE_MANIFEST_URL = (
     "https://github.com/umudunatesi/2026-yks-tercih-robotu/"
     "releases/latest/download/latest.json"

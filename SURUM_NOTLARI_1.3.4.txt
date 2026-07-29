@@ -1,0 +1,7 @@
+2026 YKS TERCİH ROBOTU — SÜRÜM 1.3.4
+
+- Derlenmiş Windows backend paketine özel koşul ve özel yetenek veri dosyaları
+  kalıcı olarak dahil edildi.
+- Kayıtlı tercih listesi başlığı göründüğü hâlde liste ayrıntılarının
+  yüklenememesine neden olan API 500 hatası giderildi.
+- Mevcut tercih listeleri ve öğrenci verileri değişmeden korunur.
