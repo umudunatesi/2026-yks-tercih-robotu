@@ -3767,7 +3767,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
           color: const Color(0xffe4def5),
           borderRadius: BorderRadius.circular(14)),
       child: Row(children: [
-        preferenceCell('Sıra', 46, bold: true, align: TextAlign.center),
+        preferenceCell('Sıra / Çıkar', 92, bold: true, align: TextAlign.center),
         preferenceCell('Program kodu', 88, bold: true),
         preferenceCell('Program / Üniversite', 240, bold: true),
         preferenceCell('Tür', 58, bold: true),
@@ -3811,14 +3811,31 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
               height: 88,
               child: Row(children: [
                 SizedBox(
-                    width: 46,
-                    child: Center(
-                        child: CircleAvatar(
-                            radius: 18,
-                            backgroundColor:
-                                statusColor?.withValues(alpha: 0.18),
-                            foregroundColor: statusColor,
-                            child: Text('${index + 1}')))),
+                    width: 92,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircleAvatar(
+                              radius: 17,
+                              backgroundColor:
+                                  statusColor?.withValues(alpha: 0.18),
+                              foregroundColor: statusColor,
+                              child: Text('${index + 1}')),
+                          if (onDelete != null) ...[
+                            const SizedBox(width: 4),
+                            IconButton.filledTonal(
+                                tooltip: 'Bu programı listeden çıkar',
+                                visualDensity: VisualDensity.compact,
+                                constraints: const BoxConstraints(
+                                    minWidth: 34, minHeight: 34),
+                                padding: EdgeInsets.zero,
+                                style: IconButton.styleFrom(
+                                    foregroundColor: const Color(0xffa33f3f),
+                                    backgroundColor: const Color(0xffffdddd)),
+                                icon: const Icon(Icons.close_rounded, size: 20),
+                                onPressed: onDelete)
+                          ]
+                        ])),
                 preferenceCell(tableValue(program['program_code']), 88,
                     bold: true),
                 SizedBox(
@@ -3848,18 +3865,6 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                                       message: '${decision['category']}',
                                       child: Icon(decisionIcon(decision),
                                           size: 18, color: statusColor)),
-                                if (onDelete != null)
-                                  IconButton(
-                                      tooltip: 'Listeden çıkar',
-                                      visualDensity: VisualDensity.compact,
-                                      constraints: const BoxConstraints(
-                                          minWidth: 32, minHeight: 32),
-                                      padding: EdgeInsets.zero,
-                                      icon: const Icon(
-                                          Icons.remove_circle_outline,
-                                          size: 20,
-                                          color: Color(0xffa95757)),
-                                      onPressed: onDelete)
                               ]),
                               Text(
                                   '${program['university'] ?? '—'} / ${program['city'] ?? '—'}'
@@ -4097,7 +4102,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                   : SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: SizedBox(
-                          width: 1382,
+                          width: 1428,
                           child: ReorderableListView.builder(
                               buildDefaultDragHandles: false,
                               header: preferenceTableHeader(),
@@ -4227,7 +4232,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: SizedBox(
-                            width: 1382,
+                            width: 1428,
                             child: Column(children: [
                               preferenceTableHeader(),
                               Expanded(
