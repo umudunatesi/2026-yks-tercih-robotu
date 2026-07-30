@@ -36,6 +36,8 @@ final selectedPreferenceStudentProvider =
 final preferenceListNameProvider = StateProvider<String>(
     (ref) => ref.watch(initialPreferenceListNameProvider));
 final comparisonProvider = StateProvider<List<Map<String, dynamic>>>((_) => []);
+final programFiltersProvider =
+    StateProvider<Map<String, dynamic>>((_) => <String, dynamic>{});
 final sessionExpiredNotifier = ValueNotifier<bool>(false);
 bool updateCheckStarted = false;
 
@@ -204,7 +206,10 @@ class YksApp extends ConsumerWidget {
       final preferences = await SharedPreferences.getInstance();
       await preferences.setString('preference_draft_basket', jsonEncode(next));
     });
-    ref.listen(selectedPreferenceStudentProvider, (_, next) async {
+    ref.listen(selectedPreferenceStudentProvider, (previous, next) async {
+      if (previous != next) {
+        ref.read(programFiltersProvider.notifier).state = {};
+      }
       final preferences = await SharedPreferences.getInstance();
       if (next == null) {
         await preferences.remove('preference_draft_student_id');
@@ -1234,6 +1239,56 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
   Timer? searchDebounce;
   int loadGeneration = 0;
 
+  void restoreFilterState() {
+    final saved = ref.read(programFiltersProvider);
+    if (saved.isEmpty) return;
+    search.text = '${saved['q'] ?? ''}';
+    university.text = '${saved['university'] ?? ''}';
+    city.text = '${saved['city'] ?? ''}';
+    minRank.text = '${saved['min_rank'] ?? ''}';
+    maxRank.text = '${saved['max_rank'] ?? ''}';
+    minQuota.text = '${saved['min_quota'] ?? ''}';
+    level = saved['level'] as String?;
+    page = saved['page'] as int? ?? 1;
+    scoreTypes.addAll(List<String>.from(saved['score_types'] ?? const []));
+    statuses.addAll(List<String>.from(saved['statuses'] ?? const []));
+    universityTypes
+        .addAll(List<String>.from(saved['university_types'] ?? const []));
+    feeStatuses.addAll(List<String>.from(saved['fee_statuses'] ?? const []));
+    languages.addAll(List<String>.from(saved['languages'] ?? const []));
+    educationTypes
+        .addAll(List<String>.from(saved['education_types'] ?? const []));
+    regions.addAll(List<String>.from(saved['regions'] ?? const []));
+    accreditedOnly = saved['accredited_only'] == true;
+    schoolTopOnly = saved['school_top_only'] == true;
+    martyrVeteranOnly = saved['martyr_veteran_only'] == true;
+    women34Only = saved['women_34_only'] == true;
+  }
+
+  void saveFilterState() {
+    ref.read(programFiltersProvider.notifier).state = {
+      'q': search.text,
+      'university': university.text,
+      'city': city.text,
+      'min_rank': minRank.text,
+      'max_rank': maxRank.text,
+      'min_quota': minQuota.text,
+      'level': level,
+      'page': page,
+      'score_types': scoreTypes.toList(),
+      'statuses': statuses.toList(),
+      'university_types': universityTypes.toList(),
+      'fee_statuses': feeStatuses.toList(),
+      'languages': languages.toList(),
+      'education_types': educationTypes.toList(),
+      'regions': regions.toList(),
+      'accredited_only': accreditedOnly,
+      'school_top_only': schoolTopOnly,
+      'martyr_veteran_only': martyrVeteranOnly,
+      'women_34_only': women34Only
+    };
+  }
+
   void scheduleSearch(String _) {
     searchDebounce?.cancel();
     searchDebounce =
@@ -1248,6 +1303,7 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
       loading = true;
       loadError = null;
     });
+    saveFilterState();
     try {
       final queryParameters = <String, dynamic>{
         'q': search.text,
@@ -1430,6 +1486,7 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
   @override
   void initState() {
     super.initState();
+    restoreFilterState();
     Future.microtask(load);
     Future.microtask(loadFavorites);
   }
@@ -1437,6 +1494,7 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
   @override
   void dispose() {
     searchDebounce?.cancel();
+    saveFilterState();
     search.dispose();
     university.dispose();
     city.dispose();
