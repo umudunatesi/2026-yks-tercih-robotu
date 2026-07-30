@@ -1446,33 +1446,110 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
     super.dispose();
   }
 
+  Future<void> showMultiSelectDialog(
+      String label, List<String> options, Set<String> selected) async {
+    final draft = {...selected};
+    final apply = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => StatefulBuilder(
+            builder: (dialogContext, setDialogState) => AlertDialog(
+                    title: Row(children: [
+                      const Icon(Icons.checklist_rounded),
+                      const SizedBox(width: 10),
+                      Expanded(child: Text(label))
+                    ]),
+                    content: SizedBox(
+                        width: 420,
+                        child: ListView(
+                            shrinkWrap: true,
+                            children: options
+                                .map((option) => CheckboxListTile(
+                                    dense: true,
+                                    contentPadding: EdgeInsets.zero,
+                                    title: Text(option),
+                                    value: draft.contains(option),
+                                    onChanged: (checked) => setDialogState(() {
+                                          if (checked == true) {
+                                            draft.add(option);
+                                          } else {
+                                            draft.remove(option);
+                                          }
+                                        })))
+                                .toList())),
+                    actions: [
+                      TextButton(
+                          onPressed: () => setDialogState(draft.clear),
+                          child: const Text('Tümünü temizle')),
+                      TextButton(
+                          onPressed: () => Navigator.pop(dialogContext, false),
+                          child: const Text('Vazgeç')),
+                      FilledButton(
+                          onPressed: () => Navigator.pop(dialogContext, true),
+                          child: const Text('Uygula'))
+                    ])));
+    if (apply == true && mounted) {
+      setState(() {
+        selected
+          ..clear()
+          ..addAll(draft);
+      });
+    }
+  }
+
   Widget multiSelectFilter(
       String label, List<String> options, Set<String> selected,
-      {double width = 260}) {
+      {double width = 230}) {
+    final summary =
+        selected.isEmpty ? 'Tümü' : selected.map((x) => x).join(', ');
     return SizedBox(
         width: width,
-        child: InputDecorator(
-            decoration: InputDecoration(
-                labelText: label,
-                helperText: selected.isEmpty
-                    ? 'Tümü'
-                    : '${selected.length} seçenek seçildi'),
-            child: Wrap(
-                spacing: 5,
-                runSpacing: 4,
-                children: options
-                    .map((option) => FilterChip(
-                        visualDensity: VisualDensity.compact,
-                        label: Text(option),
-                        selected: selected.contains(option),
-                        onSelected: (checked) => setState(() {
-                              if (checked) {
-                                selected.add(option);
-                              } else {
-                                selected.remove(option);
-                              }
-                            })))
-                    .toList())));
+        child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => showMultiSelectDialog(label, options, selected),
+            child: InputDecorator(
+                decoration: InputDecoration(
+                    labelText: label,
+                    prefixIcon: const Icon(Icons.filter_list_rounded),
+                    suffixIcon: selected.isEmpty
+                        ? const Icon(Icons.keyboard_arrow_down_rounded)
+                        : Badge(
+                            label: Text('${selected.length}'),
+                            child:
+                                const Icon(Icons.keyboard_arrow_down_rounded))),
+                child: Text(summary,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontWeight: selected.isEmpty
+                            ? FontWeight.w400
+                            : FontWeight.w700)))));
+  }
+
+  Widget filterSectionHeader(IconData icon, String title, String description) {
+    return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(children: [
+          Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                  color: const Color(0xffffe1d2),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Icon(icon, size: 19, color: const Color(0xff99543a))),
+          const SizedBox(width: 10),
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Text(title,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w800)),
+                Text(description,
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant))
+              ]))
+        ]));
   }
 
   @override
@@ -1552,6 +1629,13 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                 children: [
                   Wrap(spacing: 12, runSpacing: 12, children: [
                     SizedBox(
+                        width: (MediaQuery.sizeOf(context).width - 120)
+                            .clamp(320.0, 1400.0),
+                        child: filterSectionHeader(
+                            Icons.school_outlined,
+                            'Program ve kurum',
+                            'Üniversite, şehir ve puan türüyle aramayı daraltın')),
+                    SizedBox(
                         width: 260,
                         child: TextField(
                             controller: university,
@@ -1604,6 +1688,13 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                                       load(resetPage: true);
                                     })
                             ]))),
+                    SizedBox(
+                        width: (MediaQuery.sizeOf(context).width - 120)
+                            .clamp(320.0, 1400.0),
+                        child: filterSectionHeader(
+                            Icons.tune_rounded,
+                            'Program özellikleri',
+                            'Bir alanda birden fazla seçenek belirleyebilirsiniz')),
                     multiSelectFilter('2025 yerleşme durumu',
                         const ['Yeni', 'Dolmadı', 'Yer.Olmadı'], statuses),
                     multiSelectFilter(
@@ -1618,8 +1709,7 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                           '%25 İndirimli',
                           'Ücretli'
                         ],
-                        feeStatuses,
-                        width: 330),
+                        feeStatuses),
                     multiSelectFilter(
                         'Eğitim dili',
                         const [
@@ -1629,13 +1719,18 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                           'Fransızca',
                           'Arapça'
                         ],
-                        languages,
-                        width: 330),
+                        languages),
                     multiSelectFilter(
                         'Öğretim türü',
                         const ['Örgün', 'İkinci Öğretim', 'Uzaktan'],
-                        educationTypes,
-                        width: 300),
+                        educationTypes),
+                    SizedBox(
+                        width: (MediaQuery.sizeOf(context).width - 120)
+                            .clamp(320.0, 1400.0),
+                        child: filterSectionHeader(
+                            Icons.query_stats_rounded,
+                            'Sıralama ve kontenjan',
+                            'Başarı aralığını ve özel kontenjanları belirleyin')),
                     SizedBox(
                         width: 150,
                         child: TextField(
@@ -1678,6 +1773,13 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                         label: const Text('34 yaş üstü kadın kontenjanı'),
                         avatar: const Icon(Icons.woman_outlined),
                         onSelected: (v) => setState(() => women34Only = v)),
+                    SizedBox(
+                        width: (MediaQuery.sizeOf(context).width - 120)
+                            .clamp(320.0, 1400.0),
+                        child: filterSectionHeader(
+                            Icons.public_rounded,
+                            'Konum',
+                            'Bir veya daha fazla coğrafi bölge seçin')),
                     SizedBox(
                         width: 720,
                         child: Card(
@@ -1724,6 +1826,10 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                                                   })))
                                           .toList())
                                 ]))),
+                    SizedBox(
+                        width: (MediaQuery.sizeOf(context).width - 120)
+                            .clamp(320.0, 1400.0),
+                        child: const Divider(height: 12)),
                     FilledButton.icon(
                         onPressed: () => load(resetPage: true),
                         icon: const Icon(Icons.filter_alt),
