@@ -456,30 +456,57 @@ def programs(q: str | None = None, level: str | None = None, city: str | None = 
         if score_type_values:
             stmt = stmt.where(Program.score_type.in_(score_type_values))
     if university_type:
-        stmt = stmt.where(
-            func.tr_fold(Program.university_type)
-            == normalize_search(university_type)
-        )
+        university_type_values = [
+            normalize_search(value)
+            for value in university_type.split(",")
+            if value.strip()
+        ]
+        if university_type_values:
+            stmt = stmt.where(or_(*[
+                func.tr_fold(Program.university_type).like(f"%{value}%")
+                for value in university_type_values
+            ]))
     if language:
-        stmt = stmt.where(
-            func.tr_fold(Program.language) == normalize_search(language)
-        )
+        language_values = [
+            normalize_search(value)
+            for value in language.split(",")
+            if value.strip()
+        ]
+        if language_values:
+            stmt = stmt.where(or_(*[
+                func.tr_fold(Program.language).like(f"%{value}%")
+                for value in language_values
+            ]))
     if education_type:
-        stmt = stmt.where(
-            func.tr_fold(Program.education_type)
-            == normalize_search(education_type)
-        )
+        education_type_values = [
+            normalize_search(value)
+            for value in education_type.split(",")
+            if value.strip()
+        ]
+        if education_type_values:
+            stmt = stmt.where(or_(*[
+                func.tr_fold(Program.education_type).like(f"%{value}%")
+                for value in education_type_values
+            ]))
     if fee_status:
-        stmt = stmt.where(
-            func.tr_fold(Program.fee_status).like(
-                f"%{normalize_search(fee_status)}%"
-            )
-        )
+        fee_status_values = [
+            normalize_search(value)
+            for value in fee_status.split(",")
+            if value.strip()
+        ]
+        if fee_status_values:
+            stmt = stmt.where(or_(*[
+                func.tr_fold(Program.fee_status).like(f"%{value}%")
+                for value in fee_status_values
+            ]))
     if accreditation is True: stmt = stmt.where(Program.accreditation.is_not(None), Program.accreditation != "")
     if school_top_quota is True: stmt = stmt.where(Program.school_top_quota > 0)
     if martyr_veteran_quota is True: stmt = stmt.where(Program.martyr_veteran_quota > 0)
     if women_34_quota is True: stmt = stmt.where(Program.women_34_quota > 0)
-    if status: stmt = stmt.where(Program.rank_status_2025 == status)
+    if status:
+        status_values = [value.strip() for value in status.split(",") if value.strip()]
+        if status_values:
+            stmt = stmt.where(Program.rank_status_2025.in_(status_values))
     if min_quota is not None: stmt = stmt.where(Program.quota_2026 >= min_quota)
     if max_quota is not None: stmt = stmt.where(Program.quota_2026 <= max_quota)
     if min_rank is not None or max_rank is not None:

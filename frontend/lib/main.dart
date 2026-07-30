@@ -1213,11 +1213,11 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
   final minQuota = TextEditingController();
   String? level;
   final Set<String> scoreTypes = {};
-  String? status;
-  String? universityType;
-  String? feeStatus;
-  String? language;
-  String? educationType;
+  final Set<String> statuses = {};
+  final Set<String> universityTypes = {};
+  final Set<String> feeStatuses = {};
+  final Set<String> languages = {};
+  final Set<String> educationTypes = {};
   final Set<String> regions = {};
   bool accreditedOnly = false;
   bool schoolTopOnly = false;
@@ -1256,11 +1256,13 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
         'university': university.text.isEmpty ? null : university.text,
         'regions': regions.isEmpty ? null : regions.join(','),
         'score_type': scoreTypes.isEmpty ? null : scoreTypes.join(','),
-        'university_type': universityType,
-        'fee_status': feeStatus,
-        'language': language,
-        'education_type': educationType,
-        'status': status,
+        'university_type':
+            universityTypes.isEmpty ? null : universityTypes.join(','),
+        'fee_status': feeStatuses.isEmpty ? null : feeStatuses.join(','),
+        'language': languages.isEmpty ? null : languages.join(','),
+        'education_type':
+            educationTypes.isEmpty ? null : educationTypes.join(','),
+        'status': statuses.isEmpty ? null : statuses.join(','),
         'accreditation': accreditedOnly ? true : null,
         'school_top_quota': schoolTopOnly ? true : null,
         'martyr_veteran_quota': martyrVeteranOnly ? true : null,
@@ -1444,6 +1446,35 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
     super.dispose();
   }
 
+  Widget multiSelectFilter(
+      String label, List<String> options, Set<String> selected,
+      {double width = 260}) {
+    return SizedBox(
+        width: width,
+        child: InputDecorator(
+            decoration: InputDecoration(
+                labelText: label,
+                helperText: selected.isEmpty
+                    ? 'Tümü'
+                    : '${selected.length} seçenek seçildi'),
+            child: Wrap(
+                spacing: 5,
+                runSpacing: 4,
+                children: options
+                    .map((option) => FilterChip(
+                        visualDensity: VisualDensity.compact,
+                        label: Text(option),
+                        selected: selected.contains(option),
+                        onSelected: (checked) => setState(() {
+                              if (checked) {
+                                selected.add(option);
+                              } else {
+                                selected.remove(option);
+                              }
+                            })))
+                    .toList())));
+  }
+
   @override
   Widget build(BuildContext context) => Padding(
       padding: const EdgeInsets.all(20),
@@ -1573,65 +1604,38 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                                       load(resetPage: true);
                                     })
                             ]))),
-                    SizedBox(
-                        width: 170,
-                        child: DropdownButtonFormField<String>(
-                            initialValue: status,
-                            decoration: const InputDecoration(
-                                labelText: '2025 yerleşme durumu'),
-                            items: filterItems(
-                                const ['Yeni', 'Dolmadı', 'Yer.Olmadı']),
-                            onChanged: (v) {
-                              setState(() => status = v);
-                              load(resetPage: true);
-                            })),
-                    SizedBox(
-                        width: 170,
-                        child: DropdownButtonFormField<String>(
-                            initialValue: universityType,
-                            decoration: const InputDecoration(
-                                labelText: 'Üniversite türü'),
-                            items: filterItems(
-                                const ['DEVLET', 'VAKIF', 'KKTC', 'YURTDIŞI']),
-                            onChanged: (v) =>
-                                setState(() => universityType = v))),
-                    SizedBox(
-                        width: 170,
-                        child: DropdownButtonFormField<String>(
-                            initialValue: feeStatus,
-                            decoration: const InputDecoration(
-                                labelText: 'Burs / ücret'),
-                            items: filterItems(const [
-                              'Burslu',
-                              '%50 İndirimli',
-                              '%25 İndirimli',
-                              'Ücretli'
-                            ]),
-                            onChanged: (v) => setState(() => feeStatus = v))),
-                    SizedBox(
-                        width: 170,
-                        child: DropdownButtonFormField<String>(
-                            initialValue: language,
-                            decoration:
-                                const InputDecoration(labelText: 'Eğitim dili'),
-                            items: filterItems(const [
-                              'Türkçe',
-                              'İngilizce',
-                              'Almanca',
-                              'Fransızca',
-                              'Arapça'
-                            ]),
-                            onChanged: (v) => setState(() => language = v))),
-                    SizedBox(
-                        width: 170,
-                        child: DropdownButtonFormField<String>(
-                            initialValue: educationType,
-                            decoration: const InputDecoration(
-                                labelText: 'Öğretim türü'),
-                            items: filterItems(
-                                const ['Örgün', 'İkinci Öğretim', 'Uzaktan']),
-                            onChanged: (v) =>
-                                setState(() => educationType = v))),
+                    multiSelectFilter('2025 yerleşme durumu',
+                        const ['Yeni', 'Dolmadı', 'Yer.Olmadı'], statuses),
+                    multiSelectFilter(
+                        'Üniversite türü',
+                        const ['DEVLET', 'VAKIF', 'KKTC', 'YURTDIŞI'],
+                        universityTypes),
+                    multiSelectFilter(
+                        'Burs / ücret',
+                        const [
+                          'Burslu',
+                          '%50 İndirimli',
+                          '%25 İndirimli',
+                          'Ücretli'
+                        ],
+                        feeStatuses,
+                        width: 330),
+                    multiSelectFilter(
+                        'Eğitim dili',
+                        const [
+                          'Türkçe',
+                          'İngilizce',
+                          'Almanca',
+                          'Fransızca',
+                          'Arapça'
+                        ],
+                        languages,
+                        width: 330),
+                    multiSelectFilter(
+                        'Öğretim türü',
+                        const ['Örgün', 'İkinci Öğretim', 'Uzaktan'],
+                        educationTypes,
+                        width: 300),
                     SizedBox(
                         width: 150,
                         child: TextField(
@@ -1734,11 +1738,11 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                           setState(() {
                             level = null;
                             scoreTypes.clear();
-                            status = null;
-                            universityType = null;
-                            feeStatus = null;
-                            language = null;
-                            educationType = null;
+                            statuses.clear();
+                            universityTypes.clear();
+                            feeStatuses.clear();
+                            languages.clear();
+                            educationTypes.clear();
                             regions.clear();
                             accreditedOnly = false;
                             schoolTopOnly = false;
