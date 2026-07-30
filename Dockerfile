@@ -17,4 +17,4 @@ COPY backend/ /app/backend/
 COPY scripts/ /app/scripts/
 COPY data/ /app/data/
 COPY --from=web-builder /src/build/web /app/web
-CMD ["sh", "-c", "python scripts/bootstrap_cloud.py && uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port ${PORT:-8000} & python scripts/bootstrap_cloud.py && wait"]

@@ -1,6 +1,8 @@
 import os
 import subprocess
 import sys
+import time
+import urllib.request
 from pathlib import Path
 
 
@@ -11,9 +13,22 @@ sys.path.insert(0, str(BACKEND))
 
 from sqlalchemy import func, select
 
-from app.core.database import Base, SessionLocal, engine
+from app.core.database import SessionLocal
 from app.core.security import hash_password
 from app.models.entities import Program, User
+
+
+def wait_for_api() -> None:
+    port = os.getenv("PORT", "8000")
+    health_url = f"http://127.0.0.1:{port}/api/health"
+    for _ in range(120):
+        try:
+            with urllib.request.urlopen(health_url, timeout=2) as response:
+                if response.status == 200:
+                    return
+        except OSError:
+            time.sleep(1)
+    raise SystemExit("Web sunucusu başlangıç süresinde hazır olmadı.")
 
 
 def seed_catalog() -> None:
@@ -71,7 +86,7 @@ def bootstrap_admin() -> None:
 
 
 def main() -> None:
-    Base.metadata.create_all(engine)
+    wait_for_api()
     seed_catalog()
     bootstrap_admin()
     print("Bulut başlangıç işlemleri tamamlandı.")
