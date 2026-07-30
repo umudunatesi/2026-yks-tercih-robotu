@@ -426,8 +426,6 @@ def programs(q: str | None = None, level: str | None = None, city: str | None = 
         needle = f"% {normalized_query}%"
         stmt = stmt.where(or_(
             func.printf(" %s ", func.tr_fold(Program.program)).like(needle),
-            func.printf(" %s ", func.tr_fold(Program.university)).like(needle),
-            func.printf(" %s ", func.tr_fold(Program.faculty)).like(needle),
             func.printf(" %s ", func.tr_fold(Program.program_code)).like(needle),
         ))
     if level: stmt = stmt.where(Program.level == level)

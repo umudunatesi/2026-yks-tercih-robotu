@@ -1233,6 +1233,8 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
   int page = 1;
   static const int pageSize = 50;
   bool loading = false;
+  bool addingAll = false;
+  int addingAllProgress = 0;
   String? loadError;
   List<Map<String, dynamic>> favorites = [];
   final Set<int> selectedProgramIds = {};
@@ -1295,6 +1297,35 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
         Timer(const Duration(milliseconds: 450), () => load(resetPage: true));
   }
 
+  Map<String, dynamic> programQueryParameters(
+      {int? requestedPage, int? requestedPageSize}) {
+    return <String, dynamic>{
+      'q': search.text,
+      'level': level,
+      'city': city.text.isEmpty ? null : city.text,
+      'university': university.text.isEmpty ? null : university.text,
+      'regions': regions.isEmpty ? null : regions.join(','),
+      'score_type': scoreTypes.isEmpty ? null : scoreTypes.join(','),
+      'university_type':
+          universityTypes.isEmpty ? null : universityTypes.join(','),
+      'fee_status': feeStatuses.isEmpty ? null : feeStatuses.join(','),
+      'language': languages.isEmpty ? null : languages.join(','),
+      'education_type':
+          educationTypes.isEmpty ? null : educationTypes.join(','),
+      'status': statuses.isEmpty ? null : statuses.join(','),
+      'accreditation': accreditedOnly ? true : null,
+      'school_top_quota': schoolTopOnly ? true : null,
+      'martyr_veteran_quota': martyrVeteranOnly ? true : null,
+      'women_34_quota': women34Only ? true : null,
+      'min_rank': int.tryParse(minRank.text),
+      'max_rank': int.tryParse(maxRank.text),
+      'min_quota': int.tryParse(minQuota.text),
+      'page': requestedPage ?? page,
+      'page_size': requestedPageSize ?? pageSize
+    }..removeWhere(
+        (_, value) => value == null || (value is String && value.isEmpty));
+  }
+
   Future<void> load({bool resetPage = false}) async {
     if (!mounted) return;
     final requestGeneration = ++loadGeneration;
@@ -1305,34 +1336,9 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
     });
     saveFilterState();
     try {
-      final queryParameters = <String, dynamic>{
-        'q': search.text,
-        'level': level,
-        'city': city.text.isEmpty ? null : city.text,
-        'university': university.text.isEmpty ? null : university.text,
-        'regions': regions.isEmpty ? null : regions.join(','),
-        'score_type': scoreTypes.isEmpty ? null : scoreTypes.join(','),
-        'university_type':
-            universityTypes.isEmpty ? null : universityTypes.join(','),
-        'fee_status': feeStatuses.isEmpty ? null : feeStatuses.join(','),
-        'language': languages.isEmpty ? null : languages.join(','),
-        'education_type':
-            educationTypes.isEmpty ? null : educationTypes.join(','),
-        'status': statuses.isEmpty ? null : statuses.join(','),
-        'accreditation': accreditedOnly ? true : null,
-        'school_top_quota': schoolTopOnly ? true : null,
-        'martyr_veteran_quota': martyrVeteranOnly ? true : null,
-        'women_34_quota': women34Only ? true : null,
-        'min_rank': int.tryParse(minRank.text),
-        'max_rank': int.tryParse(maxRank.text),
-        'min_quota': int.tryParse(minQuota.text),
-        'page': page,
-        'page_size': pageSize
-      }..removeWhere(
-          (_, value) => value == null || (value is String && value.isEmpty));
       final r = await ref
           .read(dioProvider)
-          .get('/api/programs', queryParameters: queryParameters);
+          .get('/api/programs', queryParameters: programQueryParameters());
       if (!mounted || requestGeneration != loadGeneration) return;
       setState(() {
         items = r.data['items'];
@@ -1378,6 +1384,79 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
       ...additions
     ];
     setState(() => selectedProgramIds.clear());
+  }
+
+  Future<void> addAllFilteredPrograms() async {
+    if (addingAll || total == 0) return;
+    final approved = await showDialog<bool>(
+            context: context,
+            builder: (dialogContext) => AlertDialog(
+                    icon: const Icon(Icons.playlist_add_check_circle_outlined),
+                    title: const Text('Tüm sonuçları listeye aktar'),
+                    content: Text(
+                        'Mevcut filtreye uyan $total programın tamamı tercih '
+                        'listesine aktarılacak. Zaten listede bulunan programlar '
+                        'tekrar eklenmeyecek.${total > 1000 ? '\n\nSonuç sayısı yüksek olduğu için işlem biraz sürebilir.' : ''}'),
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.pop(dialogContext, false),
+                          child: const Text('Vazgeç')),
+                      FilledButton.icon(
+                          onPressed: () => Navigator.pop(dialogContext, true),
+                          icon: const Icon(Icons.done_all),
+                          label: const Text('Tümünü aktar'))
+                    ])) ??
+        false;
+    if (!approved || !mounted) return;
+
+    setState(() {
+      addingAll = true;
+      addingAllProgress = 0;
+    });
+    try {
+      const batchSize = 200;
+      final pageCount = (total / batchSize).ceil();
+      final collected = <int, Map<String, dynamic>>{};
+      for (var batchPage = 1; batchPage <= pageCount; batchPage++) {
+        final response = await ref.read(dioProvider).get('/api/programs',
+            queryParameters: programQueryParameters(
+                requestedPage: batchPage, requestedPageSize: batchSize));
+        for (final raw in (response.data['items'] as List)) {
+          final program = Map<String, dynamic>.from(raw as Map);
+          collected[program['id'] as int] = program;
+        }
+        if (!mounted) return;
+        setState(() => addingAllProgress = collected.length);
+      }
+
+      final current = ref.read(preferenceBasketProvider);
+      final currentIds = current.map((program) => program['id']).toSet();
+      final additions = collected.values
+          .where((program) => !currentIds.contains(program['id']))
+          .toList();
+      ref.read(preferenceBasketProvider.notifier).state = [
+        ...current,
+        ...additions
+      ];
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                '${additions.length} program tercih listesine aktarıldı.')));
+      }
+    } on DioException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(dioErrorMessage(
+                error, 'Tüm programlar tercih listesine aktarılamadı.'))));
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          addingAll = false;
+          addingAllProgress = 0;
+        });
+      }
+    }
   }
 
   Future<void> loadFavorites() async {
@@ -1924,6 +2003,19 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
         const SizedBox(height: 8),
         Row(children: [
           Expanded(child: Text('$total program bulundu')),
+          if (total > 0)
+            FilledButton.tonalIcon(
+                onPressed: addingAll ? null : addAllFilteredPrograms,
+                icon: addingAll
+                    ? const SizedBox(
+                        width: 17,
+                        height: 17,
+                        child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(Icons.library_add_check_outlined),
+                label: Text(addingAll
+                    ? '$addingAllProgress / $total aktarılıyor'
+                    : 'Filtrelenenlerin tümünü aktar')),
+          const SizedBox(width: 8),
           if (items.isNotEmpty)
             TextButton.icon(
                 onPressed: () => setState(() {
