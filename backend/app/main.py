@@ -419,12 +419,13 @@ def programs(q: str | None = None, level: str | None = None, city: str | None = 
              page: int = Query(1, ge=1), page_size: int = Query(50, ge=1, le=200), db: Session = Depends(get_db)):
     stmt = select(Program)
     if q:
-        needle = f"%{normalize_search(q)}%"
+        normalized_query = normalize_search(q)
+        needle = f"% {normalized_query} %"
         stmt = stmt.where(or_(
-            func.tr_fold(Program.program).like(needle),
-            func.tr_fold(Program.university).like(needle),
-            func.tr_fold(Program.faculty).like(needle),
-            func.tr_fold(Program.program_code).like(needle),
+            func.printf(" %s ", func.tr_fold(Program.program)).like(needle),
+            func.printf(" %s ", func.tr_fold(Program.university)).like(needle),
+            func.printf(" %s ", func.tr_fold(Program.faculty)).like(needle),
+            func.printf(" %s ", func.tr_fold(Program.program_code)).like(needle),
         ))
     if level: stmt = stmt.where(Program.level == level)
     if city:
