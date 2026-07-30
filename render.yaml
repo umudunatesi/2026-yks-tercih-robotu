@@ -1,5 +1,6 @@
 databases:
   - name: yks-tercih-db
+    plan: free
     databaseName: yks
     user: yks
 
@@ -7,6 +8,7 @@ services:
   - type: web
     name: yks-tercih-robotu
     runtime: docker
+    plan: free
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health
     autoDeployTrigger: commit
