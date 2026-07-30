@@ -56,7 +56,11 @@ $manifest = [ordered]@{
     )
     mandatory = $false
 }
-$manifest | ConvertTo-Json -Depth 4 |
-    Set-Content -LiteralPath (Join-Path $outputDir "latest.json") -Encoding UTF8
+$manifestJson = $manifest | ConvertTo-Json -Depth 4
+[System.IO.File]::WriteAllText(
+    (Join-Path $outputDir "latest.json"),
+    $manifestJson,
+    [System.Text.UTF8Encoding]::new($false)
+)
 Write-Host "Windows kurucusu hazır: $installer" -ForegroundColor Green
 Write-Host "SHA256: $hash"
