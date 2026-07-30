@@ -60,3 +60,4 @@ def test_turkish_search_normalization_is_case_insensitive():
     assert normalize_search("SÖZEL ÖĞRETMENLİK") == "sozel ogretmenlik"
     assert normalize_search("Tıp (İngilizce)") == "tip ingilizce"
     assert f" {normalize_search('tıp')} " not in f" {normalize_search('Kâtip Çelebi')} "
+    assert f" {normalize_search('mühendis')}" in f" {normalize_search('Mühendislik')}"

@@ -420,7 +420,10 @@ def programs(q: str | None = None, level: str | None = None, city: str | None = 
     stmt = select(Program)
     if q:
         normalized_query = normalize_search(q)
-        needle = f"% {normalized_query} %"
+        # Match from the beginning of a word while allowing the user to type
+        # a stem: "muhendis" finds "muhendislik", but "tip" does not match
+        # the middle of "katip".
+        needle = f"% {normalized_query}%"
         stmt = stmt.where(or_(
             func.printf(" %s ", func.tr_fold(Program.program)).like(needle),
             func.printf(" %s ", func.tr_fold(Program.university)).like(needle),
