@@ -3584,7 +3584,19 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                                   Tooltip(
                                       message: '${decision['category']}',
                                       child: Icon(decisionIcon(decision),
-                                          size: 18, color: statusColor))
+                                          size: 18, color: statusColor)),
+                                if (onDelete != null)
+                                  IconButton(
+                                      tooltip: 'Listeden çıkar',
+                                      visualDensity: VisualDensity.compact,
+                                      constraints: const BoxConstraints(
+                                          minWidth: 32, minHeight: 32),
+                                      padding: EdgeInsets.zero,
+                                      icon: const Icon(
+                                          Icons.remove_circle_outline,
+                                          size: 20,
+                                          color: Color(0xffa95757)),
+                                      onPressed: onDelete)
                               ]),
                               Text(
                                   '${program['university'] ?? '—'} / ${program['city'] ?? '—'}'
@@ -3618,11 +3630,6 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                     child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (onDelete != null)
-                            IconButton(
-                                tooltip: 'Listeden çıkar',
-                                icon: const Icon(Icons.delete_outline),
-                                onPressed: onDelete),
                           if (reorderable)
                             ReorderableDragStartListener(
                                 index: index,
@@ -4111,8 +4118,8 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
       }
     } on DioException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(dioErrorMessage(e, 'Dosya indirilemedi.'))));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(dioErrorMessage(e, 'Dosya indirilemedi.'))));
       }
     }
   }
@@ -4142,8 +4149,7 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
     } on DioException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text(dioErrorMessage(e, 'PDF önizlemesi açılamadı.'))));
+            content: Text(dioErrorMessage(e, 'PDF önizlemesi açılamadı.'))));
       }
     }
   }
