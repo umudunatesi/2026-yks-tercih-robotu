@@ -9,6 +9,7 @@ from app.importers.yks_excel import analyze, iter_programs
 from app.models.entities import (
     DataImport, PreferenceItem, Program, ProgramRankHistory,
 )
+from sqlalchemy import func, insert, select
 
 def main():
     parser = argparse.ArgumentParser()
@@ -36,6 +37,37 @@ def main():
             imported.record_count = report["total"]
             imported.is_active = True
             imported.report = report
+        existing_count = db.scalar(
+            select(func.count(Program.id)).where(Program.data_year == args.year)
+        ) or 0
+        if existing_count == 0:
+            program_rows = []
+            history_by_code = {}
+            for data in iter_programs(source_file):
+                history_by_code[data["program_code"]] = data.pop("history")
+                program_rows.append(data)
+            inserted = db.execute(
+                insert(Program).returning(Program.id, Program.program_code),
+                program_rows,
+            )
+            ids_by_code = {
+                row.program_code: row.id for row in inserted
+            }
+            history_rows = [
+                {
+                    "program_id": ids_by_code[program_code],
+                    **history,
+                }
+                for program_code, histories in history_by_code.items()
+                for history in histories
+            ]
+            if history_rows:
+                db.execute(insert(ProgramRankHistory), history_rows)
+            print(
+                f"{report['total']} kayıt toplu olarak içe aktarıldı; "
+                "0 eski kayıt kaldırıldı, 0 kullanılan kayıt korundu."
+            )
+            return
         imported_codes = set()
         for data in iter_programs(source_file):
             history = data.pop("history")
