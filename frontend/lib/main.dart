@@ -1732,19 +1732,22 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                             'Sıralama ve kontenjan',
                             'Başarı aralığını ve özel kontenjanları belirleyin')),
                     SizedBox(
-                        width: 150,
-                        child: TextField(
-                            controller: minRank,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                                labelText: 'En iyi sıra'))),
-                    SizedBox(
-                        width: 150,
-                        child: TextField(
-                            controller: maxRank,
-                            keyboardType: TextInputType.number,
-                            decoration: const InputDecoration(
-                                labelText: 'En düşük sıra'))),
+                        width: 312,
+                        child: Row(children: [
+                          Expanded(
+                              child: TextField(
+                                  controller: minRank,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      labelText: 'En iyi sıra'))),
+                          const SizedBox(width: 12),
+                          Expanded(
+                              child: TextField(
+                                  controller: maxRank,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      labelText: 'En düşük sıra')))
+                        ])),
                     SizedBox(
                         width: 150,
                         child: TextField(
