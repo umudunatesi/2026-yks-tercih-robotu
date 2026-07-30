@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 $projectRoot = $PSScriptRoot
-$version = "1.3.7"
+$version = "1.3.8"
 $outputRoot = Join-Path (Split-Path $projectRoot -Parent) "outputs\releases"
 $packageName = "2026-YKS-Tercih-Robotu-$version"
 $stage = Join-Path $outputRoot $packageName
@@ -53,6 +53,32 @@ New-Item -ItemType Directory -Force -Path `
 Copy-Item -LiteralPath $releaseApp -Destination `
     (Join-Path $stage "frontend\build\windows\x64\runner\Release") -Recurse
 
+# Flutter's Windows runner links against the Microsoft Visual C++ runtime.
+# Deploy it next to the executable so the app starts without a system install.
+$stagedFrontend = Join-Path $stage "frontend\build\windows\x64\runner\Release"
+$vcRuntimeRoot = Get-ChildItem `
+    "C:\Program Files\Microsoft Visual Studio\2022\*\VC\Redist\MSVC" `
+    -Directory -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -match '^\d+\.' } |
+    Sort-Object Name -Descending |
+    Select-Object -First 1
+$runtimeSearchRoots = @()
+if ($vcRuntimeRoot) {
+    $runtimeSearchRoots += Join-Path $vcRuntimeRoot.FullName `
+        "x64\Microsoft.VC143.CRT"
+}
+$runtimeSearchRoots += "$env:WINDIR\System32"
+foreach ($runtimeName in @("msvcp140.dll", "vcruntime140.dll", "vcruntime140_1.dll")) {
+    $runtimeSource = $runtimeSearchRoots |
+        ForEach-Object { Join-Path $_ $runtimeName } |
+        Where-Object { Test-Path -LiteralPath $_ } |
+        Select-Object -First 1
+    if (-not $runtimeSource) {
+        throw "Gerekli Visual C++ çalışma zamanı bulunamadı: $runtimeName"
+    }
+    Copy-Item -LiteralPath $runtimeSource -Destination $stagedFrontend -Force
+}
+
 foreach ($file in @(
     "backend\alembic.ini",
     "backend\requirements.txt",
@@ -60,7 +86,7 @@ foreach ($file in @(
     ".env.example",
     "README.md",
     "KULLANIMA_BASLA.txt",
-    "SURUM_NOTLARI_1.3.7.txt",
+    "SURUM_NOTLARI_1.3.8.txt",
     "setup_windows.bat",
     "setup_windows.ps1",
     "start_yks.bat",

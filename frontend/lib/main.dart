@@ -459,7 +459,7 @@ class AppShell extends ConsumerWidget {
                       ? 'Oturum açılmadı'
                       : 'Rol: ${roleLabel(ref.watch(userRoleProvider))}',
                   style: Theme.of(context).textTheme.bodySmall),
-              Text('Sürüm 1.3.7',
+              Text('Sürüm 1.3.8',
                   style: Theme.of(context).textTheme.labelSmall),
               const SizedBox(height: 4),
               Text('Programı hazırlayan:\nPsikolojik Danışman Uğur Güdük',

@@ -5,6 +5,20 @@ import secrets
 from pathlib import Path
 
 
+def read_bootstrap_payload(input_file: Path) -> dict:
+    """Read installer data created by both current and older Windows installers."""
+    raw = input_file.read_bytes()
+    decode_error: UnicodeDecodeError | None = None
+    for encoding in ("utf-8-sig", "cp1254", "cp1252"):
+        try:
+            return json.loads(raw.decode(encoding))
+        except UnicodeDecodeError as exc:
+            decode_error = exc
+    if decode_error is not None:
+        raise decode_error
+    raise ValueError("Yönetici bilgileri okunamadı.")
+
+
 def bootstrap_admin(database: Path, input_file: Path) -> None:
     database_url = f"sqlite:///{database.resolve().as_posix()}"
     os.environ["DATABASE_URL"] = database_url
@@ -25,7 +39,7 @@ def bootstrap_admin(database: Path, input_file: Path) -> None:
     from app.models.entities import User
 
     try:
-        payload = json.loads(input_file.read_text(encoding="utf-8-sig"))
+        payload = read_bootstrap_payload(input_file)
         email = str(payload["email"]).strip().casefold()
         full_name = str(payload["full_name"]).strip()
         password = str(payload["password"])

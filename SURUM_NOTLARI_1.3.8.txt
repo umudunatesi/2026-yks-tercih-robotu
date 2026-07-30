@@ -1,0 +1,10 @@
+2026 YKS TERCİH ROBOTU - SÜRÜM 1.3.8
+
+- Kurulum sırasında Türkçe karakter içeren yönetici adı ve şifrelerinin
+  güvenilir biçimde aktarılması sağlandı.
+- Eski kurucuların Windows-1254 kodlamasıyla oluşturduğu yönetici dosyaları
+  için geriye dönük okuma desteği eklendi.
+- Uygulamanın açılması için gerekli Microsoft Visual C++ çalışma zamanı
+  dosyaları kurulum paketine dahil edildi.
+- Temiz Windows bilgisayarlarda görülen VCRUNTIME140.dll,
+  VCRUNTIME140_1.dll ve MSVCP140.dll eksikliği giderildi.

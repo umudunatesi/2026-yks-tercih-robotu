@@ -167,6 +167,7 @@ procedure CurStepChanged(CurStep: TSetupStep);
 var
   AdminJson: String;
   AdminFile: String;
+  AdminLines: TArrayOfString;
   ResultCode: Integer;
 begin
   if CurStep <> ssPostInstall then
@@ -194,7 +195,11 @@ begin
       '{"full_name":"' + JsonEscape(AdminPage.Values[0]) +
       '","email":"' + JsonEscape(AdminPage.Values[1]) +
       '","password":"' + JsonEscape(AdminPage.Values[2]) + '"}';
-    SaveStringToFile(AdminFile, AnsiString(AdminJson), False);
+    { Always write UTF-8. Older installers used the active Windows code page,
+      which broke names and passwords containing Turkish characters. }
+    SetArrayLength(AdminLines, 1);
+    AdminLines[0] := AdminJson;
+    SaveStringsToUTF8File(AdminFile, AdminLines, False);
     Log('YKS init: admin exe');
     if not Exec(
       ExpandConstant('{app}\backend\bin\yks_backend.exe'),

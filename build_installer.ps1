@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 $projectRoot = $PSScriptRoot
-$version = "1.3.7"
+$version = "1.3.8"
 $python = Join-Path $projectRoot "backend\.venv\Scripts\python.exe"
 $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 $outputDir = Join-Path (Split-Path $projectRoot -Parent) "outputs\releases"
@@ -50,9 +50,9 @@ $manifest = [ordered]@{
     download_url = "https://github.com/umudunatesi/2026-yks-tercih-robotu/releases/download/v$version/2026-YKS-Tercih-Robotu-$version.zip"
     sha256 = $archiveHash
     release_notes = @(
-        "Tek dosyalık Windows kurucusu",
-        "Python gerektirmeyen çevrimdışı kurulum",
-        "Kurulum sırasında yönetici hesabı oluşturma"
+        "Türkçe karakterli yönetici bilgileriyle güvenilir kurulum",
+        "Visual C++ gerektirmeden doğrudan uygulama açılışı",
+        "Eski kurucuların yönetici dosyalarıyla geriye dönük uyumluluk"
     )
     mandatory = $false
 }

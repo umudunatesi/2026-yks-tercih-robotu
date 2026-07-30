@@ -39,7 +39,7 @@ Base.metadata.create_all(engine)
 catalog_update_result = apply_packaged_catalog(
     settings.database_url, Path.cwd()
 )
-APP_VERSION = "1.3.7"
+APP_VERSION = "1.3.8"
 OFFICIAL_UPDATE_MANIFEST_URL = (
     "https://github.com/umudunatesi/2026-yks-tercih-robotu/"
     "releases/latest/download/latest.json"
