@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 $projectRoot = $PSScriptRoot
-$version = "1.3.6"
+$version = "1.3.7"
 $python = Join-Path $projectRoot "backend\.venv\Scripts\python.exe"
 $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 $outputDir = Join-Path (Split-Path $projectRoot -Parent) "outputs\releases"

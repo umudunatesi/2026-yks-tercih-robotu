@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 $projectRoot = $PSScriptRoot
-$version = "1.3.6"
+$version = "1.3.7"
 $outputRoot = Join-Path (Split-Path $projectRoot -Parent) "outputs\releases"
 $packageName = "2026-YKS-Tercih-Robotu-$version"
 $stage = Join-Path $outputRoot $packageName
@@ -60,7 +60,7 @@ foreach ($file in @(
     ".env.example",
     "README.md",
     "KULLANIMA_BASLA.txt",
-    "SURUM_NOTLARI_1.3.6.txt",
+    "SURUM_NOTLARI_1.3.7.txt",
     "setup_windows.bat",
     "setup_windows.ps1",
     "start_yks.bat",
@@ -92,6 +92,8 @@ foreach ($file in @(
 if ($LASTEXITCODE -ne 0) {
     throw "Temiz dağıtım veritabanı hazırlanamadı."
 }
+Copy-Item -LiteralPath (Join-Path $stage "backend\yks.db") `
+    -Destination (Join-Path $stage "backend\catalog-update.db") -Force
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::CreateFromDirectory(
     $stage,

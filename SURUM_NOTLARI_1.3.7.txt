@@ -1,0 +1,8 @@
+2026 YKS TERCİH ROBOTU - SÜRÜM 1.3.7
+
+- Eski sürümden uygulama içi güncelleme yapan kullanıcıların 29 Temmuz tarihli
+  21.493 programlık güncel ÖSYM kataloğunu otomatik alması sağlandı.
+- Program kataloğu program kodu üzerinden birleştirilir; öğrenci, sınav sonucu,
+  kullanıcı ve tercih listesi kayıtları korunur.
+- Güncelleme öncesi veritabanı yedeği ve hata durumunda uygulama dosyalarını
+  geri alma mekanizması korunmuştur.

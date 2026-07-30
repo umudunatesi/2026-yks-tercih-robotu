@@ -19,12 +19,14 @@ from pydantic import BaseModel, Field
 from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session
 from app.core.database import Base, engine, get_db
+from app.core.config import settings
 from app.core.regions import cities_for_regions
 from app.core.text_search import normalize_search
 from app.core.security import create_access_token, current_user, hash_password, require_roles, verify_password
 from app.importers.yks_excel import analyze as analyze_excel, iter_programs
 from app.models.entities import ApplicationSetting, AuditLog, CounselingNote, DataImport, Program, ProgramRankHistory, Student, StudentExamResult, User, PreferenceList, PreferenceItem
 from app.services.exports import preference_csv, preference_pdf, preference_xlsx
+from app.services.catalog_update import apply_packaged_catalog
 from app.services.recommendation import classify
 from app.services.special_conditions import condition_details
 from app.services.special_talent import (
@@ -34,7 +36,10 @@ from app.services.special_talent import (
 )
 
 Base.metadata.create_all(engine)
-APP_VERSION = "1.3.6"
+catalog_update_result = apply_packaged_catalog(
+    settings.database_url, Path.cwd()
+)
+APP_VERSION = "1.3.7"
 OFFICIAL_UPDATE_MANIFEST_URL = (
     "https://github.com/umudunatesi/2026-yks-tercih-robotu/"
     "releases/latest/download/latest.json"

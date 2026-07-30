@@ -89,6 +89,11 @@ try {
     # Dağıtım paketindeki boş veritabanı hiçbir koşulda kullanıcı verisini ezmez.
     $packagedDatabase = Join-Path $extractPath "backend\yks.db"
     if (Test-Path -LiteralPath $packagedDatabase) {
+        $catalogDatabase = Join-Path $extractPath "backend\catalog-update.db"
+        if (-not (Test-Path -LiteralPath $catalogDatabase)) {
+            Copy-Item -LiteralPath $packagedDatabase `
+                -Destination $catalogDatabase -Force
+        }
         Remove-Item -LiteralPath $packagedDatabase -Force
     }
     Copy-Item -Path (Join-Path $extractPath "*") -Destination $install `
