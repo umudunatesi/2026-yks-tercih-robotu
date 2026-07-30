@@ -12,6 +12,16 @@ void main() {
     expect(find.text('Güvenli giriş'), findsOneWidget);
   });
 
+  testWidgets('giriş ekranı telefon boyutunda taşmaz', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester
+        .pumpWidget(const ProviderScope(child: MaterialApp(home: LoginPage())));
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Giriş yap'), findsOneWidget);
+  });
+
   testWidgets('tercih geçmişi olan öğrencileri hatasız listeler',
       (tester) async {
     final dio = Dio();

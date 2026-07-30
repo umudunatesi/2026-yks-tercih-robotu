@@ -5,6 +5,7 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./yks.db"
     secret_key: str = "development-only-change-me"
     access_token_minutes: int = 480
+    cors_origins: str = ""
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()

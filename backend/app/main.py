@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from urllib.request import Request as UrlRequest, urlopen
 from uuid import uuid4
 from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -46,6 +46,11 @@ OFFICIAL_UPDATE_MANIFEST_URL = (
 )
 app = FastAPI(title="2026 YKS Tercih Robotu API", version=APP_VERSION)
 
+
+@app.get("/api/health", include_in_schema=False)
+def health():
+    return {"status": "ok", "version": APP_VERSION}
+
 runtime_dir = Path(__file__).resolve().parents[2] / "runtime"
 runtime_dir.mkdir(parents=True, exist_ok=True)
 error_handler = RotatingFileHandler(
@@ -65,6 +70,11 @@ app_logger.propagate = False
 
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=[
+        origin.strip()
+        for origin in settings.cors_origins.split(",")
+        if origin.strip()
+    ],
     allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
@@ -1125,6 +1135,18 @@ async def preview_import(file: UploadFile = File(...), _: User = Depends(require
     finally:
         if temporary_path:
             Path(temporary_path).unlink(missing_ok=True)
+
+
+web_dist_value = os.getenv("WEB_DIST", "").strip()
+web_dist = Path(web_dist_value).resolve() if web_dist_value else None
+if web_dist is not None and web_dist.is_dir():
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def flutter_web(full_path: str):
+        requested = (web_dist / full_path).resolve()
+        if web_dist == requested or web_dist in requested.parents:
+            if requested.is_file():
+                return FileResponse(requested)
+        return FileResponse(web_dist / "index.html")
 
 @app.post("/api/imports/commit")
 async def commit_import(data_year: int, file: UploadFile = File(...),

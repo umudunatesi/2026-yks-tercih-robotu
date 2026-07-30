@@ -1,0 +1,15 @@
+.git
+.idea
+**/.dart_tool
+**/.gradle
+**/.pytest_cache
+**/__pycache__
+**/.venv
+**/build
+**/dist
+**/*.db
+**/*.db-*
+backups
+runtime
+tmp
+output
