@@ -87,8 +87,8 @@ def bootstrap_admin() -> None:
 
 def main() -> None:
     wait_for_api()
-    seed_catalog()
     bootstrap_admin()
+    seed_catalog()
     print("Bulut başlangıç işlemleri tamamlandı.")
 
 
