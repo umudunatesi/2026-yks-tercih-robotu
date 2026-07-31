@@ -1150,13 +1150,31 @@ async def preview_import(file: UploadFile = File(...), _: User = Depends(require
 web_dist_value = os.getenv("WEB_DIST", "").strip()
 web_dist = Path(web_dist_value).resolve() if web_dist_value else None
 if web_dist is not None and web_dist.is_dir():
+    def web_file_response(path: Path) -> FileResponse:
+        # Flutter's entry files must never outlive a deployment. Otherwise an
+        # old bootstrap/main bundle can be mixed with new assets and leave the
+        # user on a blank grey screen immediately after login.
+        no_cache_files = {
+            "index.html",
+            "flutter_bootstrap.js",
+            "flutter_service_worker.js",
+            "main.dart.js",
+            "version.json",
+        }
+        headers = (
+            {"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"}
+            if path.name in no_cache_files
+            else {"Cache-Control": "public, max-age=86400"}
+        )
+        return FileResponse(path, headers=headers)
+
     @app.get("/{full_path:path}", include_in_schema=False)
     def flutter_web(full_path: str):
         requested = (web_dist / full_path).resolve()
         if web_dist == requested or web_dist in requested.parents:
             if requested.is_file():
-                return FileResponse(requested)
-        return FileResponse(web_dist / "index.html")
+                return web_file_response(requested)
+        return web_file_response(web_dist / "index.html")
 
 @app.post("/api/imports/commit")
 async def commit_import(data_year: int, file: UploadFile = File(...),

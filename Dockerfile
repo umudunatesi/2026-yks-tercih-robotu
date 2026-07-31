@@ -3,7 +3,7 @@ WORKDIR /src
 COPY frontend/pubspec.yaml frontend/pubspec.lock ./
 RUN flutter pub get
 COPY frontend/ ./
-RUN flutter build web --release --dart-define=API_URL=
+RUN flutter build web --release --pwa-strategy=none --dart-define=API_URL=
 
 FROM python:3.13-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
