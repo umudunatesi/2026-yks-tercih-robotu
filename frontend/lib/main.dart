@@ -3683,7 +3683,13 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                       detail('Program kodu', program['program_code']),
                       detail('Puan türü', program['score_type']),
                       detail('Program düzeyi', program['level']),
-                      detail('Öğrenim türü', program['education_type']),
+                      detail(
+                          'Öğrenim türü',
+                          isOpenEducation(program['education_type'])
+                              ? 'Açıköğretim'
+                              : program['education_type'],
+                          highlight:
+                              isOpenEducation(program['education_type'])),
                       detail('Öğrenim süresi', program['duration']),
                       detail('Öğretim dili', program['language']),
                       detail('Ücret durumu', program['fee_status']),
@@ -3817,8 +3823,8 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
       VoidCallback? onDelete,
       {bool reorderable = true}) {
     final education = '${program['education_type'] ?? '—'}';
-    final extraEducation =
-        education.toLowerCase().contains('açık') ? 'Açıköğretim' : education;
+    final openEducation = isOpenEducation(program['education_type']);
+    final extraEducation = openEducation ? 'Açıköğretim' : education;
     return Card(
         key: ValueKey(program['id']),
         color: statusColor?.withValues(alpha: 0.10),
@@ -3884,6 +3890,11 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                                       message: 'KKTC Uyruklu',
                                       child: Icon(Icons.badge_outlined,
                                           size: 18, color: Color(0xff7b4bb7))),
+                                if (openEducation)
+                                  const Tooltip(
+                                      message: 'Açıköğretim',
+                                      child: Icon(Icons.menu_book_outlined,
+                                          size: 18, color: Color(0xffa92f3b))),
                                 if (decision != null)
                                   Tooltip(
                                       message: '${decision['category']}',
@@ -3900,7 +3911,9 @@ class _PreferencePageState extends ConsumerState<PreferencePage> {
                             ]))),
                 preferenceCell(tableValue(program['score_type']), 58,
                     bold: true, color: scoreTypeColor(program['score_type'])),
-                preferenceCell(extraEducation, 82),
+                preferenceCell(extraEducation, 82,
+                    bold: openEducation,
+                    color: openEducation ? const Color(0xffa92f3b) : null),
                 preferenceCell(tableValue(program['duration']), 54),
                 preferenceCell(tableValue(program['language']), 78),
                 preferenceCell(tableValue(program['fee_status']), 92),

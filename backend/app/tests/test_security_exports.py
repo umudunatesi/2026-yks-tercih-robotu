@@ -2,7 +2,8 @@ from types import SimpleNamespace
 import pytest
 from app.core.security import hash_password, verify_password
 from app.services.exports import (
-    format_kpss, preference_csv, preference_pdf, preference_xlsx,
+    format_kpss, is_open_education, preference_csv, preference_pdf,
+    preference_xlsx,
 )
 
 def test_password_hashing():
@@ -45,3 +46,10 @@ def test_empty_preference_list_does_not_create_blank_pdf():
 def test_kpss_display_uses_three_decimal_places():
     assert format_kpss("88.814177") == "88.814"
     assert format_kpss(None) == "—"
+
+
+def test_open_education_recognizes_source_codes():
+    assert is_open_education("AÖ")
+    assert is_open_education("Açıköğretim")
+    assert is_open_education("Açık Öğretim")
+    assert not is_open_education("Örgün")

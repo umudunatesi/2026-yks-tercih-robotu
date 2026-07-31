@@ -41,6 +41,11 @@ def format_kpss(value) -> str:
         return str(value)
 
 
+def is_open_education(value) -> bool:
+    normalized = str(value or "").strip().casefold().replace(" ", "")
+    return normalized == "aö" or "açıköğretim" in normalized
+
+
 def rows_for_export(items):
     return [
         [
@@ -178,11 +183,9 @@ def preference_pdf(
             getattr(program, "quota_2026", None)
             if getattr(program, "quota_2026", None) is not None else "—"
         )
-        education = getattr(program, "education_type", None) or "—"
-        extra_info = (
-            f"Açıköğretim / {education}"
-            if "açık" in education.casefold() else education
-        )
+        education = getattr(program, "education_type", None)
+        open_education = is_open_education(education)
+        extra_info = "Açıköğretim" if open_education else (education or "—")
         if (getattr(program, "university_type", "") or "").strip().upper() == "KKTC U.":
             extra_info = f"KKTC Uyruklu / {extra_info}"
         special = getattr(program, "special_conditions", None) or "—"
@@ -200,7 +203,13 @@ def preference_pdf(
             program.program_code,
             Paragraph(program_text, styles["Normal"]),
             program.score_type or "—",
-            Paragraph(escape(extra_info), styles["Normal"]),
+            Paragraph(
+                (
+                    f'<font color="#A92F3B"><b>{escape(extra_info)}</b></font>'
+                    if open_education else escape(extra_info)
+                ),
+                styles["Normal"],
+            ),
             getattr(program, "duration", None) or "—",
             getattr(program, "language", None) or "—",
             Paragraph(
