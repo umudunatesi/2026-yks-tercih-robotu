@@ -767,6 +767,20 @@ String kpssDisplay(dynamic extra) {
   return number == null ? '$value' : NumberFormat('0.000', 'tr').format(number);
 }
 
+bool isOpenEducation(dynamic value) {
+  final normalized = '${value ?? ''}'.trim().toUpperCase();
+  return normalized == 'AÖ' || normalized.contains('AÇIKÖĞRETİM');
+}
+
+Widget openEducationChip() => const Chip(
+    visualDensity: VisualDensity.compact,
+    backgroundColor: Color(0xffffd9dc),
+    side: BorderSide(color: Color(0xffd75a65)),
+    avatar: Icon(Icons.menu_book_outlined, size: 16, color: Color(0xffa92f3b)),
+    label: Text('Açıköğretim',
+        style:
+            TextStyle(color: Color(0xff8f2631), fontWeight: FontWeight.w800)));
+
 class SpecialTalentProgramsPage extends ConsumerStatefulWidget {
   const SpecialTalentProgramsPage({super.key});
 
@@ -1517,6 +1531,9 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                                               WrapCrossAlignment.center,
                                           children: [
                                             Text('${program['program']}'),
+                                            if (isOpenEducation(
+                                                program['education_type']))
+                                              openEducationChip(),
                                             if (program['fee_status'] != null)
                                               Chip(
                                                   visualDensity:
@@ -2109,6 +2126,8 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                                         WrapCrossAlignment.center,
                                     children: [
                                       Text('${p['program']}'),
+                                      if (isOpenEducation(p['education_type']))
+                                        openEducationChip(),
                                       if (p['kktc_national_only'] == true)
                                         const Chip(
                                             visualDensity:

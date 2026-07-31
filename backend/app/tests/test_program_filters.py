@@ -46,6 +46,9 @@ def test_education_type_aliases_match_excel_codes():
         open_programs = programs(
             education_type="Açıköğretim", page=1, page_size=50, db=session
         )
+        open_programs_from_search = programs(
+            q="Açıköğretim", page=1, page_size=50, db=session
+        )
         remote_programs = programs(
             education_type="Uzaktan", page=1, page_size=50, db=session
         )
@@ -60,6 +63,9 @@ def test_education_type_aliases_match_excel_codes():
         )
 
     assert [item["program_code"] for item in open_programs["items"]] == ["1001"]
+    assert [
+        item["program_code"] for item in open_programs_from_search["items"]
+    ] == ["1001"]
     assert [item["program_code"] for item in remote_programs["items"]] == ["1002"]
     assert {item["program_code"] for item in combined["items"]} == {"1001", "1002"}
     assert [item["program_code"] for item in formal["items"]] == ["1003"]

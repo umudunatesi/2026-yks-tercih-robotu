@@ -444,10 +444,19 @@ def programs(q: str | None = None, level: str | None = None, city: str | None = 
         normalized_code = (
             literal(" ") + func.tr_fold(Program.program_code) + literal(" ")
         )
-        stmt = stmt.where(or_(
+        query_filters = [
             normalized_program.like(needle),
             normalized_code.like(needle),
-        ))
+        ]
+        if normalized_query in {"acik", "acikogretim", "acik ogretim"}:
+            query_filters.append(
+                func.upper(func.trim(Program.education_type)) == "AÖ"
+            )
+        if normalized_query in {"uzaktan", "uzaktan ogretim"}:
+            query_filters.append(
+                func.upper(func.trim(Program.education_type)) == "UÖ"
+            )
+        stmt = stmt.where(or_(*query_filters))
     if level: stmt = stmt.where(Program.level == level)
     if city:
         stmt = stmt.where(func.tr_fold(Program.city) == normalize_search(city))
