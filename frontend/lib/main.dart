@@ -4821,12 +4821,35 @@ class _UsersPageState extends ConsumerState<UsersPage> {
                           child: const Text('Vazgeç')),
                       FilledButton(
                           onPressed: () async {
+                            final cleanName = name.text.trim();
+                            final cleanEmail = email.text.trim();
+                            if (cleanName.isEmpty || cleanEmail.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Ad soyad ve e-posta boş bırakılamaz.')));
+                              return;
+                            }
+                            if (!cleanEmail.contains('@')) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Geçerli bir e-posta adresi girin.')));
+                              return;
+                            }
+                            if (password.text.length < 10) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Şifre en az 10 karakter olmalıdır.')));
+                              return;
+                            }
                             try {
                               await ref
                                   .read(dioProvider)
                                   .post('/api/users', data: {
-                                'email': email.text,
-                                'full_name': name.text,
+                                'email': cleanEmail,
+                                'full_name': cleanName,
                                 'password': password.text,
                                 'role': role
                               });
@@ -4838,9 +4861,8 @@ class _UsersPageState extends ConsumerState<UsersPage> {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                        content: Text(
-                                            e.response?.data['detail'] ??
-                                                'Kullanıcı oluşturulamadı.')));
+                                        content: Text(dioErrorMessage(e,
+                                            'Kullanıcı oluşturulamadı.'))));
                               }
                             }
                           },

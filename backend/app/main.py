@@ -335,6 +335,10 @@ def create_user(data: UserIn, db: Session = Depends(get_db), actor: User = Depen
     full_name = data.full_name.strip()
     if not email or not full_name:
         raise HTTPException(422, "E-posta ve ad soyad boş bırakılamaz")
+    if "@" not in email or email.startswith("@") or email.endswith("@"):
+        raise HTTPException(422, "Geçerli bir e-posta adresi girin")
+    if db.scalar(select(User.id).where(User.email == email)) is not None:
+        raise HTTPException(409, "Bu e-posta adresiyle kayıtlı bir kullanıcı zaten var")
     obj = User(email=email, full_name=full_name, role=data.role, password_hash=hash_password(data.password))
     db.add(obj); db.flush(); db.add(AuditLog(user_id=actor.id, action="user.create", entity_type="user", entity_id=str(obj.id)))
     db.commit(); db.refresh(obj); return {"id": obj.id, "email": obj.email, "role": obj.role}
