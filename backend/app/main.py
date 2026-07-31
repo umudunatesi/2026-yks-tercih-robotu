@@ -16,7 +16,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, func, literal, or_, select
 from sqlalchemy.orm import Session
 from app.core.database import Base, engine, get_db
 from app.core.config import settings
@@ -438,9 +438,15 @@ def programs(q: str | None = None, level: str | None = None, city: str | None = 
         # a stem: "muhendis" finds "muhendislik", but "tip" does not match
         # the middle of "katip".
         needle = f"% {normalized_query}%"
+        normalized_program = (
+            literal(" ") + func.tr_fold(Program.program) + literal(" ")
+        )
+        normalized_code = (
+            literal(" ") + func.tr_fold(Program.program_code) + literal(" ")
+        )
         stmt = stmt.where(or_(
-            func.printf(" %s ", func.tr_fold(Program.program)).like(needle),
-            func.printf(" %s ", func.tr_fold(Program.program_code)).like(needle),
+            normalized_program.like(needle),
+            normalized_code.like(needle),
         ))
     if level: stmt = stmt.where(Program.level == level)
     if city:
