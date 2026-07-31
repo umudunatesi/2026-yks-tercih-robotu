@@ -502,10 +502,32 @@ def programs(q: str | None = None, level: str | None = None, city: str | None = 
             if value.strip()
         ]
         if education_type_values:
-            stmt = stmt.where(or_(*[
-                func.tr_fold(Program.education_type).like(f"%{value}%")
-                for value in education_type_values
-            ]))
+            folded_education_type = func.tr_fold(Program.education_type)
+            education_type_filters = []
+            for value in education_type_values:
+                if value in {"acikogretim", "ao"}:
+                    education_type_filters.append(
+                        folded_education_type.in_(["ao", "acikogretim"])
+                    )
+                elif value in {"uzaktan", "uzaktan ogretim", "uo"}:
+                    education_type_filters.append(
+                        folded_education_type.in_(["uo", "uzaktan", "uzaktan ogretim"])
+                    )
+                elif value == "orgun":
+                    education_type_filters.append(or_(
+                        Program.education_type.is_(None),
+                        Program.education_type == "",
+                        folded_education_type == "orgun",
+                    ))
+                elif value == "ikinci ogretim":
+                    education_type_filters.append(
+                        folded_education_type.like("%ikinci%")
+                    )
+                else:
+                    education_type_filters.append(
+                        folded_education_type.like(f"%{value}%")
+                    )
+            stmt = stmt.where(or_(*education_type_filters))
     if fee_status:
         fee_status_values = [
             normalize_search(value)

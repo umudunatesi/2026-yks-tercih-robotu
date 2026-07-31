@@ -1859,7 +1859,12 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                         languages),
                     multiSelectFilter(
                         'Öğretim türü',
-                        const ['Örgün', 'İkinci Öğretim', 'Uzaktan'],
+                        const [
+                          'Örgün',
+                          'İkinci Öğretim',
+                          'Açıköğretim',
+                          'Uzaktan'
+                        ],
                         educationTypes),
                     SizedBox(
                         width: (MediaQuery.sizeOf(context).width - 120)
@@ -4861,8 +4866,8 @@ class _UsersPageState extends ConsumerState<UsersPage> {
                               if (mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                        content: Text(dioErrorMessage(e,
-                                            'Kullanıcı oluşturulamadı.'))));
+                                        content: Text(dioErrorMessage(
+                                            e, 'Kullanıcı oluşturulamadı.'))));
                               }
                             }
                           },
