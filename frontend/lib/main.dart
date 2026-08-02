@@ -1858,6 +1858,7 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                     multiSelectFilter(
                         'Burs / ücret',
                         const [
+                          'Ücretsiz',
                           'Burslu',
                           '%50 İndirimli',
                           '%25 İndirimli',

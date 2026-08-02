@@ -69,3 +69,45 @@ def test_education_type_aliases_match_excel_codes():
     assert [item["program_code"] for item in remote_programs["items"]] == ["1002"]
     assert {item["program_code"] for item in combined["items"]} == {"1001", "1002"}
     assert [item["program_code"] for item in formal["items"]] == ["1003"]
+
+
+def test_free_fee_filter_matches_empty_and_explicit_values():
+    engine = create_engine("sqlite://")
+
+    @event.listens_for(engine, "connect")
+    def register_search_function(connection, _):
+        connection.create_function(
+            "tr_fold", 1, normalize_search, deterministic=True
+        )
+
+    Base.metadata.create_all(engine)
+    with Session(engine) as session:
+        session.add_all([
+            Program(
+                level="lisans", program_code="2001", university="Devlet Ü.",
+                program="Ücretsiz Program", fee_status=None,
+            ),
+            Program(
+                level="lisans", program_code="2002", university="Devlet Ü.",
+                program="Açıkça Ücretsiz Program", fee_status="Ücretsiz",
+            ),
+            Program(
+                level="lisans", program_code="2003", university="Vakıf Ü.",
+                program="Burslu Program", fee_status="Burslu",
+            ),
+        ])
+        session.commit()
+
+        free_programs = programs(
+            fee_status="Ücretsiz", page=1, page_size=50, db=session
+        )
+        combined = programs(
+            fee_status="Ücretsiz,Burslu", page=1, page_size=50, db=session
+        )
+
+    assert {item["program_code"] for item in free_programs["items"]} == {
+        "2001", "2002"
+    }
+    assert {item["program_code"] for item in combined["items"]} == {
+        "2001", "2002", "2003"
+    }

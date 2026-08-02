@@ -544,10 +544,20 @@ def programs(q: str | None = None, level: str | None = None, city: str | None = 
             if value.strip()
         ]
         if fee_status_values:
-            stmt = stmt.where(or_(*[
-                func.tr_fold(Program.fee_status).like(f"%{value}%")
-                for value in fee_status_values
-            ]))
+            folded_fee_status = func.tr_fold(Program.fee_status)
+            fee_status_filters = []
+            for value in fee_status_values:
+                if value == "ucretsiz":
+                    fee_status_filters.append(or_(
+                        Program.fee_status.is_(None),
+                        Program.fee_status == "",
+                        folded_fee_status.like("%ucretsiz%"),
+                    ))
+                else:
+                    fee_status_filters.append(
+                        folded_fee_status.like(f"%{value}%")
+                    )
+            stmt = stmt.where(or_(*fee_status_filters))
     if accreditation is True: stmt = stmt.where(Program.accreditation.is_not(None), Program.accreditation != "")
     if school_top_quota is True: stmt = stmt.where(Program.school_top_quota > 0)
     if martyr_veteran_quota is True: stmt = stmt.where(Program.martyr_veteran_quota > 0)
