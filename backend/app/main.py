@@ -422,6 +422,7 @@ def special_talent_programs(
 @app.get("/api/programs")
 def programs(q: str | None = None, level: str | None = None, city: str | None = None,
              university: str | None = None, regions: str | None = None,
+             program_name: str | None = None,
              score_type: str | None = None, university_type: str | None = None,
              language: str | None = None, education_type: str | None = None,
              fee_status: str | None = None, accreditation: bool | None = None,
@@ -461,11 +462,27 @@ def programs(q: str | None = None, level: str | None = None, city: str | None = 
     if city:
         stmt = stmt.where(func.tr_fold(Program.city) == normalize_search(city))
     if university:
-        stmt = stmt.where(
-            func.tr_fold(Program.university).like(
-                f"%{normalize_search(university)}%"
-            )
-        )
+        university_values = [
+            normalize_search(value)
+            for value in university.split(",")
+            if value.strip()
+        ]
+        if university_values:
+            stmt = stmt.where(or_(*[
+                func.tr_fold(Program.university).like(f"%{value}%")
+                for value in university_values
+            ]))
+    if program_name:
+        program_name_values = [
+            normalize_search(value)
+            for value in program_name.split(",")
+            if value.strip()
+        ]
+        if program_name_values:
+            stmt = stmt.where(or_(*[
+                func.tr_fold(Program.program) == value
+                for value in program_name_values
+            ]))
     if regions:
         region_values = [x.strip() for x in regions.split(",") if x.strip()]
         if region_values:
@@ -611,6 +628,23 @@ def programs(q: str | None = None, level: str | None = None, city: str | None = 
             for program in rows
         ],
     }
+
+
+@app.get("/api/program-filter-options")
+def program_filter_options(
+    field: str = Query(..., pattern="^(university|program)$"),
+    q: str | None = None,
+    limit: int = Query(40, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    column = Program.university if field == "university" else Program.program
+    stmt = select(column).where(column.is_not(None), column != "").distinct()
+    if q and q.strip():
+        stmt = stmt.where(
+            func.tr_fold(column).like(f"%{normalize_search(q)}%")
+        )
+    values = db.scalars(stmt.order_by(column.asc()).limit(limit)).all()
+    return {"items": values}
 
 
 def program_payload(

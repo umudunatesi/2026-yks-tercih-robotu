@@ -111,3 +111,47 @@ def test_free_fee_filter_matches_empty_and_explicit_values():
     assert {item["program_code"] for item in combined["items"]} == {
         "2001", "2002", "2003"
     }
+
+
+def test_multiple_universities_and_program_names_can_be_combined():
+    engine = create_engine("sqlite://")
+
+    @event.listens_for(engine, "connect")
+    def register_search_function(connection, _):
+        connection.create_function(
+            "tr_fold", 1, normalize_search, deterministic=True
+        )
+
+    Base.metadata.create_all(engine)
+    with Session(engine) as session:
+        session.add_all([
+            Program(
+                level="lisans", program_code="3001",
+                university="Ankara Üniversitesi", program="Tıp",
+            ),
+            Program(
+                level="lisans", program_code="3002",
+                university="Hacettepe Üniversitesi", program="Tıp",
+            ),
+            Program(
+                level="lisans", program_code="3003",
+                university="Hacettepe Üniversitesi", program="Diş Hekimliği",
+            ),
+            Program(
+                level="lisans", program_code="3004",
+                university="Ege Üniversitesi", program="Tıp",
+            ),
+        ])
+        session.commit()
+
+        result = programs(
+            university="Ankara Üniversitesi,Hacettepe Üniversitesi",
+            program_name="Tıp,Diş Hekimliği",
+            page=1,
+            page_size=50,
+            db=session,
+        )
+
+    assert {item["program_code"] for item in result["items"]} == {
+        "3001", "3002", "3003"
+    }

@@ -1225,7 +1225,6 @@ class ProgramsPage extends ConsumerStatefulWidget {
 
 class _ProgramsPageState extends ConsumerState<ProgramsPage> {
   final search = TextEditingController();
-  final university = TextEditingController();
   final city = TextEditingController();
   final minRank = TextEditingController();
   final maxRank = TextEditingController();
@@ -1234,6 +1233,8 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
   final Set<String> scoreTypes = {};
   final Set<String> statuses = {};
   final Set<String> universityTypes = {};
+  final Set<String> universities = {};
+  final Set<String> programNames = {};
   final Set<String> feeStatuses = {};
   final Set<String> languages = {};
   final Set<String> educationTypes = {};
@@ -1259,7 +1260,12 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
     final saved = ref.read(programFiltersProvider);
     if (saved.isEmpty) return;
     search.text = '${saved['q'] ?? ''}';
-    university.text = '${saved['university'] ?? ''}';
+    universities.addAll(List<String>.from(saved['universities'] ?? const []));
+    final legacyUniversity = '${saved['university'] ?? ''}'.trim();
+    if (universities.isEmpty && legacyUniversity.isNotEmpty) {
+      universities.add(legacyUniversity);
+    }
+    programNames.addAll(List<String>.from(saved['program_names'] ?? const []));
     city.text = '${saved['city'] ?? ''}';
     minRank.text = '${saved['min_rank'] ?? ''}';
     maxRank.text = '${saved['max_rank'] ?? ''}';
@@ -1284,7 +1290,8 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
   void saveFilterState() {
     ref.read(programFiltersProvider.notifier).state = {
       'q': search.text,
-      'university': university.text,
+      'universities': universities.toList(),
+      'program_names': programNames.toList(),
       'city': city.text,
       'min_rank': minRank.text,
       'max_rank': maxRank.text,
@@ -1317,7 +1324,8 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
       'q': search.text,
       'level': level,
       'city': city.text.isEmpty ? null : city.text,
-      'university': university.text.isEmpty ? null : university.text,
+      'university': universities.isEmpty ? null : universities.join(','),
+      'program_name': programNames.isEmpty ? null : programNames.join(','),
       'regions': regions.isEmpty ? null : regions.join(','),
       'score_type': scoreTypes.isEmpty ? null : scoreTypes.join(','),
       'university_type':
@@ -1592,7 +1600,6 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
     searchDebounce?.cancel();
     saveFilterState();
     search.dispose();
-    university.dispose();
     city.dispose();
     minRank.dispose();
     maxRank.dispose();
@@ -1664,6 +1671,163 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                 decoration: InputDecoration(
                     labelText: label,
                     prefixIcon: const Icon(Icons.filter_list_rounded),
+                    suffixIcon: selected.isEmpty
+                        ? const Icon(Icons.keyboard_arrow_down_rounded)
+                        : Badge(
+                            label: Text('${selected.length}'),
+                            child:
+                                const Icon(Icons.keyboard_arrow_down_rounded))),
+                child: Text(summary,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        fontWeight: selected.isEmpty
+                            ? FontWeight.w400
+                            : FontWeight.w700)))));
+  }
+
+  Future<void> showSearchableMultiSelectDialog(
+      String label, String field, Set<String> selected) async {
+    final draft = {...selected};
+    final query = TextEditingController();
+    Timer? debounce;
+    List<String> options = [];
+    bool dialogLoading = true;
+    StateSetter? updateDialog;
+
+    Future<void> fetchOptions([String value = '']) async {
+      updateDialog?.call(() => dialogLoading = true);
+      try {
+        final response = await ref.read(dioProvider).get(
+            '/api/program-filter-options',
+            queryParameters: {'field': field, 'q': value, 'limit': 60});
+        final fetched = List<String>.from(response.data['items'] ?? const []);
+        if (updateDialog == null) {
+          options = fetched;
+          dialogLoading = false;
+        } else {
+          updateDialog?.call(() {
+            options = fetched;
+            dialogLoading = false;
+          });
+        }
+      } catch (_) {
+        if (updateDialog == null) {
+          dialogLoading = false;
+        } else {
+          updateDialog?.call(() => dialogLoading = false);
+        }
+      }
+    }
+
+    await fetchOptions();
+    if (!mounted) {
+      query.dispose();
+      return;
+    }
+    final apply = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) =>
+            StatefulBuilder(builder: (dialogContext, setDialogState) {
+              updateDialog = setDialogState;
+              final visibleOptions = {...draft, ...options}.toList()..sort();
+              return AlertDialog(
+                  title: Text('$label seç'),
+                  content: SizedBox(
+                      width: 560,
+                      height: 520,
+                      child: Column(children: [
+                        TextField(
+                            controller: query,
+                            autofocus: true,
+                            decoration: InputDecoration(
+                                hintText: '$label içinde ara',
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: draft.isEmpty
+                                    ? null
+                                    : Badge(
+                                        label: Text('${draft.length}'),
+                                        child: const Icon(
+                                            Icons.check_circle_outline))),
+                            onChanged: (value) {
+                              debounce?.cancel();
+                              debounce = Timer(
+                                  const Duration(milliseconds: 350),
+                                  () => fetchOptions(value));
+                            }),
+                        const SizedBox(height: 10),
+                        if (draft.isNotEmpty)
+                          Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text('${draft.length} seçim yapıldı',
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w700))),
+                        if (dialogLoading)
+                          const LinearProgressIndicator(minHeight: 2),
+                        const SizedBox(height: 6),
+                        Expanded(
+                            child: visibleOptions.isEmpty && !dialogLoading
+                                ? const Center(
+                                    child: Text('Eşleşen seçenek bulunamadı.'))
+                                : ListView.builder(
+                                    itemCount: visibleOptions.length,
+                                    itemBuilder: (_, index) {
+                                      final option = visibleOptions[index];
+                                      return CheckboxListTile(
+                                          dense: true,
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          value: draft.contains(option),
+                                          title: Text(option),
+                                          onChanged: (checked) =>
+                                              setDialogState(() {
+                                                if (checked == true) {
+                                                  draft.add(option);
+                                                } else {
+                                                  draft.remove(option);
+                                                }
+                                              }));
+                                    }))
+                      ])),
+                  actions: [
+                    TextButton(
+                        onPressed: () => setDialogState(draft.clear),
+                        child: const Text('Tümünü temizle')),
+                    TextButton(
+                        onPressed: () => Navigator.pop(dialogContext, false),
+                        child: const Text('Vazgeç')),
+                    FilledButton(
+                        onPressed: () => Navigator.pop(dialogContext, true),
+                        child: const Text('Uygula'))
+                  ]);
+            }));
+    debounce?.cancel();
+    query.dispose();
+    updateDialog = null;
+    if (apply == true && mounted) {
+      setState(() {
+        selected
+          ..clear()
+          ..addAll(draft);
+      });
+      load(resetPage: true);
+    }
+  }
+
+  Widget searchableMultiSelectFilter(
+      String label, String field, Set<String> selected,
+      {double width = 300}) {
+    final summary = selected.isEmpty ? 'Tümü' : selected.join(', ');
+    return SizedBox(
+        width: width,
+        child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () =>
+                showSearchableMultiSelectDialog(label, field, selected),
+            child: InputDecorator(
+                decoration: InputDecoration(
+                    labelText: label,
+                    prefixIcon: const Icon(Icons.manage_search_rounded),
                     suffixIcon: selected.isEmpty
                         ? const Icon(Icons.keyboard_arrow_down_rounded)
                         : Badge(
@@ -1789,15 +1953,12 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                             Icons.school_outlined,
                             'Program ve kurum',
                             'Üniversite, şehir ve puan türüyle aramayı daraltın')),
-                    SizedBox(
-                        width: 260,
-                        child: TextField(
-                            controller: university,
-                            onSubmitted: (_) => load(resetPage: true),
-                            decoration: const InputDecoration(
-                                labelText: 'Üniversite adı',
-                                prefixIcon:
-                                    Icon(Icons.account_balance_outlined)))),
+                    searchableMultiSelectFilter(
+                        'Üniversiteler', 'university', universities,
+                        width: 320),
+                    searchableMultiSelectFilter(
+                        'Programlar', 'program', programNames,
+                        width: 320),
                     SizedBox(
                         width: 180,
                         child: TextField(
@@ -2000,7 +2161,6 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                     TextButton(
                         onPressed: () {
                           city.clear();
-                          university.clear();
                           minRank.clear();
                           maxRank.clear();
                           minQuota.clear();
@@ -2009,6 +2169,8 @@ class _ProgramsPageState extends ConsumerState<ProgramsPage> {
                             scoreTypes.clear();
                             statuses.clear();
                             universityTypes.clear();
+                            universities.clear();
+                            programNames.clear();
                             feeStatuses.clear();
                             languages.clear();
                             educationTypes.clear();
